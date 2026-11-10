@@ -1,0 +1,41 @@
+name: 💡 功能建议
+description: 提出新功能或改进建议
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请说明使用场景与想要的效果。本项目是零依赖纯原生工程，
+        引入第三方库、需要电脑/服务器的方案通常不会被采纳。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 想解决什么问题
+      description: 现在的使用中遇到了什么不便？
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 期望的实现方式
+      placeholder: 例如：设置页增加一个开关，可以…
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 考虑过的替代方案
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: 参与意愿
+      options:
+        - label: 我愿意自己提交 PR 实现（可先看 CONTRIBUTING.md）
+          required: false
