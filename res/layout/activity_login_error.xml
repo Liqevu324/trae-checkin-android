@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WebView 组件异常时的降级页（避免直接闪退） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/page"
+    android:padding="32dp">
+
+    <TextView
+        android:id="@+id/tvError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:text="@string/login_webview_broken"
+        android:textColor="@color/ink"
+        android:textSize="@dimen/text_body" />
+
+    <TextView
+        android:id="@+id/btnErrorBack"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/btn_small_height"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_btn_secondary"
+        android:gravity="center"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="@string/cd_back"
+        android:textColor="@color/brand_deep"
+        android:textSize="@dimen/text_body"
+        android:textStyle="bold" />
+
+</LinearLayout>

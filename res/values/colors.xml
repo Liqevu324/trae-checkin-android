@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  设计系统配色（1:1 对照原版浅色品牌蓝方案）。
+  命名约定：
+    brand_*  品牌蓝           ok_*   成功绿
+    warn_*   琥珀提醒          err_*  危险红（只用于删除）
+    ink*     文字层级          page/surface/line 背景与分割线
+-->
+<resources>
+
+    <!-- 品牌 -->
+    <color name="brand_primary">#2F6BFF</color>       <!-- 主操作、选中态、进度环 -->
+    <color name="brand_deep">#1E54D6</color>          <!-- 品牌蓝【文字专用】 -->
+    <color name="brand_soft">#EDF3FF</color>          <!-- 品牌浅底（标签底、图标底） -->
+    <color name="brand_grad_start">#2F6BFF</color>    <!-- 渐变起（135°） -->
+    <color name="brand_grad_end">#5B8CFF</color>      <!-- 渐变止 -->
+    <color name="brand_on_primary">#FFFFFF</color>    <!-- 主色上的文字/图标 -->
+
+    <!-- 成功 / 已完成 -->
+    <color name="ok">#00B87C</color>
+    <color name="ok_deep">#00714E</color>             <!-- 成功绿【文字专用】 -->
+    <color name="ok_soft">#E6F8F1</color>
+
+    <!-- 提醒 / 待留意 -->
+    <color name="warn">#F59E0B</color>
+    <color name="warn_deep">#B45309</color>           <!-- 琥珀【文字专用】 -->
+    <color name="warn_soft">#FEF4E6</color>
+
+    <!-- 危险（全 App 只用于删除） -->
+    <color name="err">#C62828</color>
+    <color name="err_soft">#FEF0F0</color>
+
+    <!-- Hero 卡片专用文字 -->
+    <color name="hero_label">#4C6BA8</color>           <!-- Hero 卡顶部小标题 -->
+    <color name="hero_track">#DEE8FA</color>           <!-- 圆环底轨 -->
+
+    <!-- 文字层级 -->
+    <color name="ink">#121A25</color>                 <!-- 主文字（对齐原版采样） -->
+    <color name="ink_2">#6C757C</color>               <!-- 次要文字 / 行描述 -->
+    <color name="ink_muted">#5F7086</color>           <!-- 说明文字 -->
+    <color name="ink_3">#94A3B8</color>               <!-- 只用于图标、描边、分割线 -->
+    <color name="section_label">#7A8494</color>        <!-- 分组标题（自动任务 / 签到配置 …） -->
+    <color name="disclaimer">#6C7481</color>           <!-- 页脚免责声明 -->
+
+    <!-- 底部 Tab 选中态：原版淡紫胶囊 -->
+    <color name="tab_selected_bg">#E8DEF7</color>
+
+    <!-- 作者卡片渐变（对齐原版蓝色卡） -->
+    <color name="author_grad_start">#3670FF</color>
+    <color name="author_grad_end">#3C75FF</color>
+
+    <!-- 背景与分割线 -->
+    <color name="page">#F5F6FB</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="line">#E9EDF5</color>
+    <color name="line_2">#F1F4F9</color>
+    <color name="progress_track">#EDF1F7</color>
+
+    <!-- drawable 依赖的辅助色 -->
+    <color name="ghost_stroke">#C9D6F0</color>
+    <color name="ghost_bg">#F8FAFF</color>
+    <color name="info_card_stroke">#D8E2F5</color>
+    <color name="info_card_bg">#FBFCFE</color>
+
+</resources>

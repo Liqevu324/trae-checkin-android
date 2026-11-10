@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  主界面（第 1 批：结构骨架，第 2 批精细化）
+  自上而下：问候区 -> Hero 渐变卡 -> 账号列表头 -> 账号列表 / 空状态 -> 底部 Tab
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/page">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
+
+            <!-- 1. 问候区 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/page_padding"
+                android:paddingRight="@dimen/page_padding"
+                android:paddingTop="14dp"
+                android:paddingBottom="10dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/placeholder_empty"
+                        android:textColor="@color/ink_2"
+                        android:textSize="@dimen/text_caption"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvGreeting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/greeting_checkin"
+                        android:textColor="@color/ink"
+                        android:textSize="@dimen/text_h3"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btnAdd"
+                    android:layout_width="@dimen/add_button"
+                    android:layout_height="@dimen/add_button"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@drawable/bg_icon_button"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="@string/cd_add_account">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_add_dark"
+                        android:contentDescription="@string/cd_add_account" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2. Hero 渐变卡 -->
+            <LinearLayout
+                android:id="@+id/heroCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/page_padding"
+                android:layout_marginRight="@dimen/page_padding"
+                android:orientation="vertical"
+                android:background="@drawable/bg_hero_card"
+                android:elevation="@dimen/hero_elevation"
+                android:padding="@dimen/card_hero_padding">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/hero_title"
+                        android:textColor="@color/hero_label"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvHeroStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_badge_warn"
+                        android:paddingLeft="9dp"
+                        android:paddingRight="9dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:text="@string/status_pending"
+                        android:textColor="@color/warn_deep"
+                        android:textSize="@dimen/text_badge"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:baselineAligned="false">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <TextView
+                                android:id="@+id/tvDone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/ink"
+                                android:textSize="@dimen/text_display"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="2dp"
+                                android:layout_marginBottom="8dp"
+                                android:text="/"
+                                android:textColor="@color/ink_3"
+                                android:textSize="@dimen/text_h3" />
+
+                            <TextView
+                                android:id="@+id/tvTotal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="2dp"
+                                android:layout_marginBottom="10dp"
+                                android:text="0"
+                                android:textColor="@color/ink_2"
+                                android:textSize="@dimen/text_h3"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvHeroSub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/hero_sub_default"
+                            android:textColor="@color/ink_2"
+                            android:textSize="@dimen/text_caption" />
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="@dimen/ring_sm"
+                        android:layout_height="@dimen/ring_sm">
+
+                        <ProgressBar
+                            android:id="@+id/ringProgress"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressDrawable="@drawable/progress_ring_brand" />
+
+                        <TextView
+                            android:id="@+id/tvPercent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="0%"
+                            android:textColor="@color/brand_deep"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btnCheckinAll"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/btn_primary_height"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@drawable/bg_btn_primary"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginRight="6dp"
+                        android:src="@drawable/ic_check_white"
+                        android:contentDescription="@string/checkin_all" />
+
+                    <TextView
+                        android:id="@+id/tvCheckinAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/checkin_all"
+                        android:textColor="@color/brand_on_primary"
+                        android:textSize="@dimen/text_body_l"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 3. 账号列表头 -->
+            <LinearLayout
+                android:id="@+id/accountSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/page_padding"
+                android:paddingRight="@dimen/page_padding"
+                android:paddingTop="20dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/account_section"
+                    android:textColor="@color/ink"
+                    android:textSize="@dimen/text_body_l"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAccountCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/placeholder_empty"
+                    android:textColor="@color/ink_2"
+                    android:textSize="@dimen/text_caption" />
+            </LinearLayout>
+
+            <!-- 4. 账号列表（代码动态填充） -->
+            <LinearLayout
+                android:id="@+id/accountList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/page_padding"
+                android:paddingRight="@dimen/page_padding" />
+
+            <!-- 5. 空状态 -->
+            <include
+                android:id="@+id/emptyView"
+                layout="@layout/empty_accounts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 6. 底部 Tab -->
+    <include
+        android:id="@+id/bottomNav"
+        layout="@layout/view_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

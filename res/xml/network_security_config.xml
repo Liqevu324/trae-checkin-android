@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  只允许官方 OAuth 回调的 loopback 地址使用明文 HTTP。
+  授权页登录成功后上游会跳 http://127.0.0.1:18080/authorize?... ，
+  WebView 直接截住该 URL、不会真的发起请求；放行是为了避免部分 ROM 在
+  shouldOverrideUrlLoading 之前就以 cleartext 策略吞掉这次跳转（导致回调丢失）。
+  其余域名一律禁止明文，登录页与所有接口仍走 HTTPS。
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>

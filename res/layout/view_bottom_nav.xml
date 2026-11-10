@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  底部 Tab：白底 + 顶部 1dp 分割线，四项等分。
+  每项内层的 pill* 容器由 NavHelper 施加「淡紫胶囊」选中态与缩放淡入动画。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/surface">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tabbar_height"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:id="@+id/navCheckin"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:id="@+id/pillCheckin"
+                android:layout_width="66dp"
+                android:layout_height="42dp"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/ivNavCheckin"
+                    android:layout_width="@dimen/tab_icon"
+                    android:layout_height="@dimen/tab_icon"
+                    android:src="@drawable/ic_nav_checkin"
+                    android:contentDescription="@string/tab_checkin" />
+
+                <TextView
+                    android:id="@+id/tvNavCheckin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/tab_checkin"
+                    android:textColor="@color/brand_primary"
+                    android:textSize="@dimen/text_tab" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navCredits"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:id="@+id/pillCredits"
+                android:layout_width="66dp"
+                android:layout_height="42dp"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/ivNavCredits"
+                    android:layout_width="@dimen/tab_icon"
+                    android:layout_height="@dimen/tab_icon"
+                    android:src="@drawable/ic_nav_credits"
+                    android:contentDescription="@string/tab_credits" />
+
+                <TextView
+                    android:id="@+id/tvNavCredits"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/tab_credits"
+                    android:textColor="@color/ink_3"
+                    android:textSize="@dimen/text_tab" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navLogs"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:id="@+id/pillLogs"
+                android:layout_width="66dp"
+                android:layout_height="42dp"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/ivNavLogs"
+                    android:layout_width="@dimen/tab_icon"
+                    android:layout_height="@dimen/tab_icon"
+                    android:src="@drawable/ic_nav_logs"
+                    android:contentDescription="@string/tab_logs" />
+
+                <TextView
+                    android:id="@+id/tvNavLogs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/tab_logs"
+                    android:textColor="@color/ink_3"
+                    android:textSize="@dimen/text_tab" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navSettings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:id="@+id/pillSettings"
+                android:layout_width="66dp"
+                android:layout_height="42dp"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/ivNavSettings"
+                    android:layout_width="@dimen/tab_icon"
+                    android:layout_height="@dimen/tab_icon"
+                    android:src="@drawable/ic_nav_settings"
+                    android:contentDescription="@string/tab_settings" />
+
+                <TextView
+                    android:id="@+id/tvNavSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/tab_settings"
+                    android:textColor="@color/ink_3"
+                    android:textSize="@dimen/text_tab" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

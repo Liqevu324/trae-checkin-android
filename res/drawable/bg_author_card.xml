@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 作者卡片：原版蓝色渐变 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="@color/author_grad_start"
+        android:endColor="@color/author_grad_end"
+        android:angle="315" />
+    <corners android:radius="20dp" />
+</shape>

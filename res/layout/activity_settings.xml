@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  设置页 v2.4.0：对齐原版分组式布局。
+  自动任务 / 签到配置 / 后台与权限 / 数据 / 帮助与协议 / 关于与免责声明。
+  所有 Switch 初始状态由 SettingsActivity.onCreate 从 Prefs 读回，禁止 XML 写死 checked。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/page">
+
+    <!-- 大标题 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/page_padding"
+        android:paddingRight="@dimen/page_padding"
+        android:paddingTop="18dp"
+        android:paddingBottom="12dp"
+        android:text="@string/settings_title"
+        android:textColor="@color/ink"
+        android:textSize="@dimen/text_h3"
+        android:textStyle="bold" />
+
+    <ScrollView
+        android:id="@+id/settingsScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/settingsContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/page_padding"
+            android:paddingRight="@dimen/page_padding"
+            android:paddingBottom="20dp">
+
+            <!-- 通知权限提示条 -->
+            <LinearLayout
+                android:id="@+id/noticeBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_warn_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvNotice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:lineSpacingExtra="2dp"
+                    android:text="@string/setting_notice_off"
+                    android:textColor="@color/warn_deep"
+                    android:textSize="@dimen/text_caption" />
+
+                <ImageView
+                    android:layout_width="@dimen/icon_sm"
+                    android:layout_height="@dimen/icon_sm"
+                    android:layout_marginStart="6dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:contentDescription="@string/setting_notice_off" />
+            </LinearLayout>
+
+            <!-- ============ 自动任务 ============ -->
+            <TextView
+                style="@style/SectionLabel"
+                android:text="@string/section_auto_task" />
+
+            <LinearLayout
+                style="@style/SettingsCard">
+
+                <!-- 每日自动签到 -->
+                <LinearLayout style="@style/SettingRow">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_auto" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_auto_desc2" />
+                    </LinearLayout>
+                    <Switch android:id="@+id/swAuto" style="@style/SettingSwitch" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <!-- 每日自动凭证保活 -->
+                <LinearLayout style="@style/SettingRow">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_keep_alive" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_keep_alive_desc" />
+                    </LinearLayout>
+                    <Switch android:id="@+id/swKeepAlive" style="@style/SettingSwitch" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <!-- 首次打开自动签到 -->
+                <LinearLayout style="@style/SettingRow">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_first_open" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_first_open_desc" />
+                    </LinearLayout>
+                    <Switch android:id="@+id/swFirstOpen" style="@style/SettingSwitch" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <!-- 通知提醒 -->
+                <LinearLayout style="@style/SettingRow">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_notify" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_notify_desc2" />
+                    </LinearLayout>
+                    <Switch android:id="@+id/swNotify" style="@style/SettingSwitch" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 签到配置 ============ -->
+            <TextView
+                style="@style/SectionLabel"
+                android:text="@string/section_checkin_config" />
+
+            <LinearLayout style="@style/SettingsCard">
+
+                <LinearLayout
+                    android:id="@+id/rowSchedule"
+                    style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_schedule" />
+                        <TextView
+                            android:id="@+id/tvScheduleValue"
+                            style="@style/SettingDesc"
+                            android:text="@string/placeholder_empty" />
+                    </LinearLayout>
+                    <TextView
+                        style="@style/SettingAction"
+                        android:text="@string/setting_manage" />
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/setting_schedule" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <LinearLayout
+                    android:id="@+id/rowJitter"
+                    style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_jitter2" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_jitter_desc2" />
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvJitterValue"
+                        style="@style/SettingValue"
+                        android:text="@string/placeholder_empty" />
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/setting_jitter2" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 后台与权限 ============ -->
+            <TextView
+                style="@style/SectionLabel"
+                android:text="@string/section_permission" />
+
+            <LinearLayout style="@style/SettingsCard">
+
+                <LinearLayout android:id="@+id/rowBattery" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_battery" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_battery_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/setting_battery" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <LinearLayout android:id="@+id/rowAutostart" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_autostart" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_autostart_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/setting_autostart" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <LinearLayout android:id="@+id/rowAlarm" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_alarm" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_alarm_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/setting_alarm" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 数据 ============ -->
+            <TextView
+                style="@style/SectionLabel"
+                android:text="@string/section_data" />
+
+            <LinearLayout style="@style/SettingsCard">
+
+                <LinearLayout android:id="@+id/rowExport" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_export" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_export_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/setting_export" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <LinearLayout android:id="@+id/rowImport" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_import" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_import_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/setting_import" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <LinearLayout android:id="@+id/rowClearLogs" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/setting_clear_logs" />
+                        <TextView style="@style/SettingDesc" android:text="@string/setting_clear_logs_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/setting_clear_logs" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 帮助与协议 ============ -->
+            <TextView
+                style="@style/SectionLabel"
+                android:text="@string/section_help" />
+
+            <LinearLayout style="@style/SettingsCard">
+
+                <LinearLayout android:id="@+id/rowGuide" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/doc_guide_title" />
+                        <TextView style="@style/SettingDesc" android:text="@string/doc_guide_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/doc_guide_title" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <LinearLayout android:id="@+id/rowPrivacy" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/doc_privacy_title" />
+                        <TextView style="@style/SettingDesc" android:text="@string/doc_privacy_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/doc_privacy_title" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <LinearLayout android:id="@+id/rowTerms" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/doc_terms_title" />
+                        <TextView style="@style/SettingDesc" android:text="@string/doc_terms_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/doc_terms_title" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+
+                <LinearLayout android:id="@+id/rowOpensource" style="@style/SettingRowClickable">
+                    <LinearLayout style="@style/SettingTextCol">
+                        <TextView style="@style/SettingTitle" android:text="@string/doc_opensource_title" />
+                        <TextView style="@style/SettingDesc" android:text="@string/doc_opensource_desc" />
+                    </LinearLayout>
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/doc_opensource_title" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 作者卡片 ============ -->
+            <LinearLayout
+                android:id="@+id/authorCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_author_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@drawable/bg_author_avatar">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/author_initial"
+                        android:textColor="@color/brand_deep"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/author_title"
+                        android:textColor="@color/brand_on_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/author_sub"
+                        android:textColor="#DCE8FF"
+                        android:textSize="@dimen/text_body" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:tint="@color/brand_on_primary"
+                    android:contentDescription="@string/doc_opensource_title" />
+            </LinearLayout>
+
+            <!-- ============ 开发者 / 版本 ============ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:elevation="@dimen/card_elevation"
+                android:paddingLeft="@dimen/card_padding"
+                android:paddingRight="@dimen/card_padding">
+
+                <LinearLayout style="@style/SettingRow">
+                    <TextView
+                        style="@style/AboutLabel"
+                        android:text="@string/about_developer" />
+                    <TextView
+                        android:id="@+id/tvDeveloper"
+                        style="@style/AboutValue"
+                        android:gravity="end"
+                        android:lineSpacingExtra="2dp"
+                        android:text="@string/developer_name" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+                <LinearLayout style="@style/SettingRow">
+                    <TextView
+                        style="@style/AboutLabel"
+                        android:text="@string/about_version" />
+                    <TextView
+                        android:id="@+id/tvVersion"
+                        style="@style/AboutValue"
+                        android:text="@string/placeholder_empty" />
+                </LinearLayout>
+                <View style="@style/SettingDivider" />
+                <LinearLayout
+                    android:id="@+id/rowAbout"
+                    style="@style/SettingRowClickable">
+                    <TextView
+                        style="@style/AboutLabel"
+                        android:text="@string/about_license" />
+                    <TextView
+                        style="@style/SettingValue"
+                        android:text="@string/about_license_value" />
+                    <ImageView style="@style/SettingArrow" android:contentDescription="@string/about_license" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 免责声明 ============ -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:gravity="center"
+                android:lineSpacingExtra="3dp"
+                android:text="@string/disclaimer_text"
+                android:textColor="@color/disclaimer"
+                android:textSize="@dimen/text_badge" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 底部 Tab（与签到 / 积分 / 日志页一致） -->
+    <include
+        android:id="@+id/bottomNav"
+        layout="@layout/view_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

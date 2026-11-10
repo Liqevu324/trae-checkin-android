@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 全局 -->
+    <string name="app_name">Trae 签到助手</string>
+    <string name="brand_name">Trae 签到助手</string>
+
+    <!-- 通用 -->
+    <string name="cd_back">返回</string>
+    <string name="cd_add_account">添加账号</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_confirm">确定</string>
+    <string name="action_delete">删除</string>
+    <string name="placeholder_empty">--</string>
+
+    <!-- 底部导航 -->
+    <string name="tab_checkin">签到</string>
+    <string name="tab_credits">积分</string>
+    <string name="tab_logs">日志</string>
+    <string name="tab_settings">设置</string>
+
+    <!-- 主界面 -->
+    <string name="greeting_checkin">今日签到</string>
+    <string name="hero_title">今日签到</string>
+    <string name="hero_sub_default">今日可获得 100 积分</string>
+    <string name="checkin_all">一键签到</string>
+    <string name="account_section">账号</string>
+    <string name="account_count_format">共 %1$d 个</string>
+
+    <!-- 账号状态 -->
+    <string name="status_done">已签到</string>
+    <string name="status_pending">待签到</string>
+    <string name="status_failed">签到失败</string>
+    <string name="status_completed_today">今日已完成</string>
+    <string name="account_sub_pending">今日待签到</string>
+    <string name="account_sub_checked">今日已签到</string>
+    <string name="account_sub_checked_fmt">今日已签 +%1$s 积分</string>
+
+    <!-- 一键签到 -->
+    <string name="checkin_running">签到中…</string>
+    <string name="checkin_summary_fmt">成功 %1$d 个，失败 %2$d 个</string>
+    <string name="checkin_all_done">今天都签过了</string>
+    <string name="checkin_need_account">请先添加账号</string>
+    <string name="checkin_first_open_running">首次打开自动签到中…</string>
+    <string name="toast_single_ok">签到成功</string>
+    <string name="toast_single_fail">签到失败：%1$s</string>
+
+    <!-- 账号操作菜单 -->
+    <string name="menu_checkin_now">立即签到</string>
+    <string name="menu_view_credits">查看积分</string>
+    <string name="menu_delete_account">删除账号</string>
+    <string name="menu_relogin">重新登录</string>
+    <string name="menu_set_device">设置设备号</string>
+    <string name="status_invalid_action">登录已过期 · 点我重新登录</string>
+
+    <!-- 手动设置设备号（9074 兜底） -->
+    <string name="device_dialog_title">设置设备号</string>
+    <string name="device_dialog_msg" formatted="false">TRAE 上游会校验设备号。若签到持续报 9074，请填入电脑版 TRAE 注册过的真实设备号（12~20 位纯数字）。\n\n获取方式：电脑上按 Win+R 输入 %APPDATA% 回车，进入 Trae CN\User\globalStorage\storage.json（或 TRAE SOLO CN / Trae 目录），搜索 iCubeAuthInfo://icube-dc，冒号后的数字就是设备号。\n\n可把整段文件文本发到手机后直接粘进来，应用会自动提取。只需设置一次，之后签到全程在手机完成，不需要服务器。</string>
+    <string name="device_dialog_hint">12~20 位纯数字，或粘贴 storage.json 文本</string>
+    <string name="device_current_fmt">当前设备号：%1$s（%2$s）</string>
+    <string name="device_src_manual">手动设置</string>
+    <string name="device_src_auto">自动生成</string>
+    <string name="device_saved">设备号已保存，请点「立即签到」验证</string>
+    <string name="device_saved_relogin">设备号已保存，建议再点「重新登录」让授权页用该号注册一次</string>
+    <string name="device_invalid">设备号无效：必须是 12~20 位纯数字</string>
+    <string name="device_extract_failed">未能从文本中提取到 12~20 位纯数字设备号</string>
+    <string name="device_duplicate">该设备号已被其它账号使用，同一设备一天只能签一个账号</string>
+    <string name="device_action_save">保存</string>
+    <string name="device_action_reset">恢复自动生成</string>
+    <string name="device_reset_done">已恢复为自动生成的设备号</string>
+    <string name="dialog_delete_title">删除账号</string>
+    <string name="dialog_delete_msg">确定删除「%1$s」吗？仅从本应用移除，不影响原登录。</string>
+    <string name="toast_account_deleted">已删除</string>
+    <string name="data_load_failed">账号数据读取失败，已重置显示</string>
+
+    <!-- 空状态 -->
+    <string name="empty_title">还没有账号</string>
+    <string name="account_default_name">Trae 账号</string>
+    <string name="empty_hint">点击右上角 + 添加</string>
+    <string name="empty_hint_auto">添加后每天自动签到，无需打开电脑</string>
+    <string name="add_account">添加账号</string>
+
+    <!-- 登录页 -->
+    <string name="login_title">添加账号</string>
+    <string name="login_title_relogin">重新登录</string>
+    <string name="login_privacy_tip">仅在本机读取 Trae 登录凭证，不会上传到任何服务器</string>
+    <string name="login_done">重新发起登录</string>
+    <string name="login_hint_auto">在页面完成手机号登录后将自动返回，全程无需电脑。若页面空白，请点下方按钮重试。</string>
+    <string name="login_hint_wait">还没检测到登录状态，请确认已用手机号完成登录（可点下方按钮重试）</string>
+    <string name="login_page_slow">页面加载较慢，请检查网络后点下方按钮重试</string>
+    <string name="login_hint_retry">请点下方「重新发起登录」重新授权一次</string>
+    <string name="login_js_dead">网页脚本未能运行（WebView 内核 Chrome/%1$s），页面按钮会全部失效。请到应用商店更新「Android System WebView」，或在系统设置中更新 WebView 后重试。</string>
+    <string name="login_js_no_events">网页脚本已加载但交互未启用（WebView 内核 Chrome/%1$s）。请更新「Android System WebView」后重试；若仍无效，请长按下方按钮复制诊断信息反馈。</string>
+    <string name="login_hint_not_yet">还没检测到登录状态。若上方页面按钮点不动，请长按下方按钮复制诊断信息反馈。</string>
+    <string name="login_diag_longpress_tip">（长按下方按钮可复制诊断信息）</string>
+    <string name="login_diag_copied">诊断信息已复制</string>
+    <string name="login_saved_need_device">账号已保存，但设备校验未通过，请在账号菜单点「设置设备号」填入电脑版 TRAE 的真实设备号</string>
+    <string name="login_loading">加载中…</string>
+    <string name="login_verifying">正在校验登录凭证…</string>
+    <string name="login_timeout">登录超时，请重试</string>
+    <string name="login_no_token">未读取到登录凭证，请先在页面完成登录</string>
+    <string name="login_webview_broken">系统 WebView 组件异常，请更新 Android System WebView 后重试</string>
+    <string name="login_page_error">页面加载失败（错误码 %1$d），请检查网络或稍后重试</string>
+    <string name="login_ok_fmt">已添加「%1$s」</string>
+    <string name="login_relogin_ok">登录凭证已更新</string>
+    <string name="login_err_invalid">凭证无效，请重新登录</string>
+    <string name="login_err_device">设备未注册（9004），请重新登录账号</string>
+    <string name="login_err_device_rejected">设备校验未通过（9074），请在账号菜单点「设置设备号」填入真实设备号</string>
+    <string name="login_err_network">网络错误：%1$s</string>
+    <string name="login_err_http">请求失败（HTTP %1$d）</string>
+    <string name="login_err_server_http">服务端异常（HTTP %1$d），请稍后重试</string>
+    <string name="login_err_server_unexpected">服务器返回了无法识别的内容：%1$s</string>
+    <string name="login_err_code">接口返回异常（code=%1$d）</string>
+    <string name="login_err_duplicate">该账号已在列表中，无需重复添加</string>
+    <string name="login_err_unknown">登录失败，请重试</string>
+
+    <!-- 积分页 -->
+    <string name="credits_title">积分明细</string>
+    <string name="credits_total_label">总剩余积分</string>
+    <string name="credits_empty">暂无积分数据，请先添加账号</string>
+    <string name="credits_refresh">刷新</string>
+    <string name="credits_account_count_fmt">共 %1$d 个账号</string>
+    <string name="credits_account_count_fail_fmt">共 %1$d 个账号 · 部分获取失败</string>
+    <string name="credits_fail">获取失败</string>
+    <string name="credits_row_sub">剩余积分</string>
+    <string name="credits_all_fail">积分获取失败，请检查网络后重试</string>
+    <string name="credits_retry">重试</string>
+
+    <!-- 日志页 -->
+    <string name="logs_title">签到日志</string>
+    <string name="logs_empty">还没有签到记录</string>
+    <string name="logs_clear">清空</string>
+    <string name="logs_clear_title">清除日志</string>
+    <string name="logs_clear_msg">确定清空全部签到历史记录吗？此操作不可撤销。</string>
+    <string name="logs_cleared">日志已清除</string>
+    <string name="logs_today">今天</string>
+    <string name="logs_yesterday">昨天</string>
+    <string name="log_credits_fmt">签到 +%1$s 积分，剩余 %2$s</string>
+    <string name="log_zero_fmt">签到成功，剩余 %1$s</string>
+    <string name="log_result_fmt">+%1$s 积分</string>
+    <string name="log_failure_fmt">签到失败：%1$s</string>
+    <string name="log_failure_code_fmt">（code=%1$d）</string>
+    <string name="log_failure_unknown">未知原因</string>
+    <string name="log_copy_done">完整报错已复制</string>
+    <string name="log_copy_failed">复制失败，请重试</string>
+
+    <!-- 签到引擎：SOLO 客户端契约与真实错误码 -->
+    <string name="checkin_err_login_expired">登录已过期，请点「重新登录」更新凭据</string>
+    <string name="checkin_err_forbidden">请求被拒绝（403），请稍后重试或重新登录</string>
+    <string name="checkin_err_disabled">该账号暂未开放每日签到（可能为付费/企业账号）</string>
+    <string name="checkin_err_status_unknown">接口响应异常</string>
+    <string name="checkin_err_status_fmt">接口返回：%1$s</string>
+    <string name="checkin_err_network_fmt">网络错误：%1$s</string>
+    <string name="checkin_err_server_fmt">服务端异常（HTTP %1$d）</string>
+    <string name="checkin_err_exec_fmt">执行异常：%1$s</string>
+    <string name="checkin_err_claim_fmt">领取失败（code=%1$d）</string>
+    <string name="checkin_err_device_rejected">设备校验未通过（9074）。自动生成设备号不被上游认可，请在账号菜单点「设置设备号」填入电脑版 TRAE 的真实设备号</string>
+    <string name="checkin_err_device_rejected_manual">设备校验未通过（9074），已用手动设备号重试仍失败；请确认号码与电脑版 TRAE 一致，或重新登录后再试</string>
+    <string name="checkin_err_device_rejected_rotated">设备校验未通过（9074），已自动换号重试仍失败；请在账号菜单点「设置设备号」填入真实设备号</string>
+    <string name="checkin_err_device_already">当前设备今日已签到（9095），请明日再试</string>
+    <string name="checkin_err_device_register">设备未注册（9004），请重新登录账号完成设备绑定</string>
+    <string name="checkin_err_unconfirmed">服务端未确认签到，请稍后重试</string>
+    <string name="checkin_msg_success">签到成功</string>
+    <string name="checkin_msg_already">今日已签到</string>
+    <string name="checkin_msg_pending">未签到</string>
+
+    <!-- SOLO OAuth 登录 -->
+    <string name="login_oauth_pending">请在页面完成手机号登录，授权后会自动返回</string>
+    <string name="login_oauth_invalid_callback">登录回调校验失败，请重新点「添加账号」</string>
+    <string name="login_oauth_no_credential">登录回调缺少凭证，请重新登录</string>
+    <string name="login_oauth_exchange_failed">换取登录凭证失败，请重新登录</string>
+    <string name="login_oauth_device_registered">设备号已随官方授权页注册；若仍报 9074，请在账号菜单「设置设备号」填入电脑版 TRAE 的真实设备号</string>
+
+    <!-- 设置页 -->
+    <string name="settings_title">设置</string>
+    <string name="setting_auto">每日自动签到</string>
+    <string name="setting_auto_desc">到点自动领取每日积分</string>
+    <string name="setting_time">签到时间</string>
+    <string name="setting_jitter">随机延迟</string>
+    <string name="setting_jitter_desc">在设定时间后随机延后执行，降低风控概率</string>
+    <string name="setting_notify">通知提醒</string>
+    <string name="setting_notify_desc">签到完成后推送结果通知</string>
+    <string name="setting_first_open">首次打开自动签到</string>
+    <string name="setting_battery">电池优化白名单</string>
+    <string name="setting_battery_desc">未加入白名单时，系统可能杀掉定时任务</string>
+    <string name="setting_autostart">自启动与后台运行</string>
+    <string name="setting_autostart_desc">OPPO / vivo / 小米需手动允许</string>
+    <string name="setting_clear_logs">清除日志</string>
+    <string name="setting_clear_logs_desc">清空全部签到历史记录</string>
+    <string name="setting_about">关于</string>
+    <string name="setting_about_desc">版本信息与说明</string>
+    <string name="version_format">版本 %1$s</string>
+    <string name="jitter_minutes_format">%1$d 分钟</string>
+    <string name="jitter_no_delay">不延迟</string>
+
+    <!-- 设置页：提示条与权限引导 -->
+    <string name="setting_notice_off">通知已被系统关闭，点击前往开启</string>
+    <string name="notify_prompt_once">通知权限未开启，可在设置中开启</string>
+    <string name="setting_notice_denied">通知权限未授予，点击前往开启</string>
+    <string name="setting_perm_denied_notify">通知权限被拒绝，可在系统设置中开启</string>
+    <string name="setting_go_settings">去设置</string>
+    <string name="setting_later">稍后</string>
+    <string name="setting_battery_title">后台运行权限</string>
+    <string name="setting_battery_msg">OPPO / 小米 / 华为等系统会限制后台任务，导致定时签到不执行。请允许本应用后台运行。</string>
+    <string name="setting_alarm_title">定时权限</string>
+    <string name="setting_alarm_msg">定时签到需要「闹钟和提醒」权限，否则到点可能不会执行。</string>
+    <string name="setting_autostart_title">自启动与后台运行</string>
+    <string name="setting_autostart_msg">各机型的开启路径：\nOPPO：设置 › 应用管理 › 自启动\nvivo：设置 › 权限管理 › 自启动\n小米：设置 › 应用设置 › 自启动\n华为：设置 › 应用 › 启动管理\n\n若找不到入口，可先在「应用设置」中打开自启动与后台运行权限。</string>
+    <string name="setting_open_app_details">打开应用设置</string>
+    <string name="setting_auto_on">已开启每日自动签到</string>
+    <string name="setting_auto_off">已关闭每日自动签到</string>
+    <string name="setting_notify_on">已开启通知提醒</string>
+    <string name="setting_notify_off">已关闭通知提醒</string>
+    <string name="setting_first_open_on">已开启首次打开自动签到</string>
+    <string name="setting_first_open_off">已关闭首次打开自动签到</string>
+    <string name="setting_time_saved_fmt">签到时间已设为 %1$s</string>
+    <string name="setting_jitter_saved_fmt">随机延迟已设为 %1$s</string>
+    <string name="setting_logs_cleared">日志已清除</string>
+    <string name="setting_about_msg">Trae 签到助手 %1$s\n每日自动领取 Trae 100 积分，登录凭证仅保存在本机。</string>
+
+    <!-- ===== v2.4.0：设置页分组、文档与关于 ===== -->
+    <string name="section_auto_task">自动任务</string>
+    <string name="section_checkin_config">签到配置</string>
+    <string name="section_permission">后台与权限</string>
+    <string name="section_data">数据</string>
+    <string name="section_help">帮助与协议</string>
+
+    <string name="setting_auto_desc2">每天在设定时间自动为所有账号签到；登录凭证快过期时会自动换新，无需重新登录</string>
+    <string name="setting_keep_alive">每日自动凭证保活</string>
+    <string name="setting_keep_alive_desc">每天 03:30 自动换新一次登录凭证（token），避免到点签到时凭证过期失效</string>
+    <string name="setting_first_open_desc">每天第一次打开 APP 时自动签到一次，之后再次打开不重复</string>
+    <string name="setting_notify_desc2">签到结果与异常提醒推送系统通知</string>
+
+    <string name="setting_schedule">管理签到时间与排除账号</string>
+    <string name="setting_manage">管理</string>
+    <string name="setting_jitter2">随机延迟（分钟）</string>
+    <string name="setting_jitter_desc2">在签到时间基础上随机延迟 0~N 分钟，模拟手动签到</string>
+    <string name="jitter_label_fmt">±%1$d 分</string>
+    <string name="jitter_label_none">±0 分</string>
+    <string name="setting_alarm">精确闹钟权限</string>
+    <string name="setting_alarm_desc">Android 12+ 需允许「闹钟和提醒」，否则定时任务可能不准时</string>
+    <string name="setting_alarm_granted">已允许精确闹钟，定时任务可准时执行</string>
+
+    <string name="setting_export">导出账号</string>
+    <string name="setting_export_desc">JSON 格式，复制到剪贴板后可自行保存或迁移</string>
+    <string name="setting_import">导入账号</string>
+    <string name="setting_import_desc">从剪贴板粘贴 JSON，只追加账号、不覆盖现有数据</string>
+
+    <string name="doc_guide_title">使用说明书</string>
+    <string name="doc_guide_desc">安装、登录、签到的完整操作说明（首次登录必读）</string>
+    <string name="doc_privacy_title">隐私协议</string>
+    <string name="doc_privacy_desc">了解本应用如何处理与保护你的数据</string>
+    <string name="doc_terms_title">用户协议与免责声明</string>
+    <string name="doc_terms_desc">使用限制、免费分发声明与责任范围</string>
+    <string name="doc_opensource_title">开源许可与致谢</string>
+    <string name="doc_opensource_desc">MIT 许可证、第三方依赖说明与致谢</string>
+    <string name="doc_sub_guide">建议首次使用前完整阅读</string>
+    <string name="doc_sub_privacy">数据只保存在你的手机上</string>
+    <string name="doc_sub_terms">使用即表示同意以下条款</string>
+    <string name="doc_sub_opensource">MIT License · 致谢上游开源项目</string>
+    <string name="docs_title">说明文档</string>
+    <string name="docs_footer_fmt">版本 %1$s · Trae 签到助手</string>
+    <string name="docs_load_failed">文档加载失败，请重试</string>
+
+    <string name="author_initial">T</string>
+    <string name="author_title">TraeCheckin 开源项目</string>
+    <string name="author_sub">愿这个小工具对您有帮助</string>
+    <string name="developer_name">辉夜彩叶一休尼\n我是八千代的狗</string>
+    <string name="about_developer">开发者</string>
+    <string name="about_version">版本</string>
+    <string name="about_license">开源许可</string>
+    <string name="about_license_value">MIT</string>
+    <string name="disclaimer_text">本软件仅供学习研究使用，请勿用于商业用途或倒卖。本应用仅通过免费分享渠道分发，未授权任何收费售卖；从第三方付费购得的版本均非开发者提供，由此产生的问题与开发者无关。因使用本软件产生的一切后果由使用者自行承担。本应用与字节跳动 / Trae 官方无任何关联。</string>
+
+    <string name="setting_keep_alive_on">已开启每日凭证保活</string>
+    <string name="setting_keep_alive_off">已关闭每日凭证保活</string>
+
+    <string name="setting_schedule_title">管理签到时间与排除账号</string>
+    <string name="setting_schedule_time">签到时间</string>
+    <string name="setting_schedule_exclude">排除账号</string>
+    <string name="setting_exclude_none">未排除任何账号</string>
+    <string name="setting_exclude_fmt">已排除 %1$d 个账号</string>
+    <string name="setting_exclude_no_account">还没有账号可排除</string>
+
+    <string name="setting_export_done">账号数据已复制到剪贴板</string>
+    <string name="setting_export_empty">还没有账号可导出</string>
+    <string name="setting_export_warn">导出内容包含完整登录凭据，等同于账号登录状态。请妥善保管、不要外传，切勿上传到公开仓库、网盘分享或聊天群。</string>
+    <string name="setting_import_title">导入账号</string>
+    <string name="setting_import_hint">粘贴导出的 JSON 文本</string>
+    <string name="setting_import_done_fmt">已导入 %1$d 个账号</string>
+    <string name="setting_import_none">没有新增账号（格式不对或账号已存在）</string>
+    <string name="setting_import_invalid">文本不是有效的账号导出格式</string>
+    <string name="setting_import_warn">导入只会追加账号，不会覆盖现有数据。请确认文本来源可信。</string>
+    <string name="action_copy">复制</string>
+    <string name="action_import">导入</string>
+    <string name="action_paste">从剪贴板粘贴</string>
+
+    <string name="checkin_all_excluded">所有账号已被排除，请到设置里调整</string>
+    <string name="account_excluded">已排除自动签到</string>
+
+</resources>

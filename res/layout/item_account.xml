@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  账号条目：头像块 + 昵称/状态 + 状态胶囊。
+  由 MainActivity 代码 addView 动态填充（账号量级 < 50，无需 RecyclerView）。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_card"
+    android:elevation="@dimen/card_elevation"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:paddingTop="@dimen/card_account_padding_v"
+    android:paddingBottom="@dimen/card_account_padding_v">
+
+    <TextView
+        android:id="@+id/tvAvatar"
+        android:layout_width="@dimen/avatar_md"
+        android:layout_height="@dimen/avatar_md"
+        android:background="@drawable/bg_avatar_brand"
+        android:gravity="center"
+        android:text="T"
+        android:textColor="@color/brand_on_primary"
+        android:textSize="@dimen/text_card_title"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvAlias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/placeholder_empty"
+            android:textColor="@color/ink"
+            android:textSize="@dimen/text_body_l"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvAccountStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/status_pending"
+            android:textColor="@color/ink_2"
+            android:textSize="@dimen/text_caption" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_badge_warn"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:text="@string/status_pending"
+        android:textColor="@color/warn_deep"
+        android:textSize="@dimen/text_badge"
+        android:textStyle="bold" />
+
+</LinearLayout>

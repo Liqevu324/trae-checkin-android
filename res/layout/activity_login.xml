@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  登录页：原生 WebView 加载 Trae 官方登录页 https://www.trae.cn/login。
+  不对页面做任何注入：登录成功后由原生 cookie 探针读取会话 cookie，
+  再用 GetUserToken 换取 JWT，原生校验通过后落库。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/page">
+
+    <!-- 顶部自绘返回栏（白底 48dp，标题居中） -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/surface">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_back_dark"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_back" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/login_title"
+            android:textColor="@color/ink"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <!-- 右侧占位块，保证标题视觉居中 -->
+        <View
+            android:layout_width="40dp"
+            android:layout_height="1dp"
+            android:layout_marginEnd="6dp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line" />
+
+    <!-- 隐私说明：单行便签，不再包白卡，省出的高度全给 WebView -->
+    <TextView
+        android:id="@+id/tvPrivacyTip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/page_padding"
+        android:layout_marginRight="@dimen/page_padding"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_info_card"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="@string/login_privacy_tip"
+        android:textColor="@color/ink_2"
+        android:textSize="11sp" />
+
+    <!-- 官方登录页 -->
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp"
+        android:background="@color/surface" />
+
+    <!-- 底部操作区 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/surface"
+        android:padding="12dp">
+
+        <!-- 加载中（默认隐藏） -->
+        <LinearLayout
+            android:id="@+id/loadingRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/progressLoading"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/brand_primary"
+                android:max="100" />
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@string/login_loading"
+                android:textColor="@color/ink_2"
+                android:textSize="@dimen/text_caption" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnLoginDone"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/btn_primary_height"
+            android:background="@drawable/bg_btn_primary"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/login_done"
+            android:textColor="@color/brand_on_primary"
+            android:textSize="@dimen/text_body_l"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:text="@string/login_hint_auto"
+            android:textColor="@color/ink_2"
+            android:textSize="@dimen/text_caption" />
+    </LinearLayout>
+
+</LinearLayout>

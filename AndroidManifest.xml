@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.traecheckin.mobile"
+    android:versionCode="10"
+    android:versionName="2.4.2">
+
+    <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="34" />
+
+    <!-- 网络：访问 api.trae.cn 与 trae.cn 登录页 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Android 13+ 通知权限 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- 开机重排闹钟 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- 电池优化白名单（OPPO / 小米 / 华为必做，否则定时任务会被杀） -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- 精确定时 -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <!-- 签到期间持有唤醒锁 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:name=".App"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Trae"
+        android:networkSecurityConfig="@xml/network_security_config">
+
+        <!-- 主界面 -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode|screenLayout|smallestScreenSize"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 登录页：Trae 官方网页登录 -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:label="@string/login_title"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode|screenLayout|smallestScreenSize"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- 积分明细 -->
+        <activity
+            android:name=".CreditsActivity"
+            android:exported="false"
+            android:label="@string/credits_title" />
+
+        <!-- 签到日志 -->
+        <activity
+            android:name=".LogsActivity"
+            android:exported="false"
+            android:label="@string/logs_title" />
+
+        <!-- 设置 -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_title" />
+
+        <!-- 通用文档页：使用说明书 / 隐私协议 / 用户协议 / 开源许可 -->
+        <activity
+            android:name=".DocsActivity"
+            android:exported="false"
+            android:label="@string/docs_title" />
+
+        <!-- 定时签到：只由 AlarmManager 触发，禁止外部调用 -->
+        <receiver
+            android:name=".CheckinReceiver"
+            android:exported="false" />
+
+        <!-- 每日 03:30 凭证保活：只由 AlarmManager 触发，禁止外部调用 -->
+        <receiver
+            android:name=".MaintenanceReceiver"
+            android:exported="false" />
+
+        <!-- 开机自启：重新排下一次闹钟 -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

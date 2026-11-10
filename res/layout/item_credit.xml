@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 积分明细行：头像块 + 昵称 + 右侧剩余积分 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_card"
+    android:elevation="@dimen/card_elevation"
+    android:paddingLeft="12dp"
+    android:paddingRight="14dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
+
+    <TextView
+        android:id="@+id/tvCreditAvatar"
+        android:layout_width="@dimen/avatar_sm"
+        android:layout_height="@dimen/avatar_sm"
+        android:background="@drawable/bg_avatar_brand"
+        android:gravity="center"
+        android:text="T"
+        android:textColor="@color/brand_on_primary"
+        android:textSize="@dimen/text_body"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvCreditName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/placeholder_empty"
+            android:textColor="@color/ink"
+            android:textSize="@dimen/text_body"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvCreditSub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/credits_fail"
+            android:textColor="@color/ink_2"
+            android:textSize="@dimen/text_badge" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvCreditValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/placeholder_empty"
+        android:textColor="@color/brand_primary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

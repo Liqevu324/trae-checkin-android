@@ -1,0 +1,111 @@
+# 开源许可与致谢
+
+## 0. 重要声明（请先看）
+
+- 本软件有不少代码直接参考了原版开源项目 wb-checkin-android
+  （https://github.com/Luckyboy-daidai/wb-checkin-android，MIT，
+  Copyright (c) 2026 闪光男孩小志），包括设置页分组结构、界面配色、
+  Prefs 静态方法与 SharedPreferences 持久化写法、开关状态回读逻辑，
+  以及应用内文档与免责声明的框架。原项目版权行与 MIT 许可证全文已在第 2 节保留。
+  业务层代码因技术栈不同（本软件零 Gradle、零 AndroidX）由 AI 对照参考重新生成，
+  不是逐文件复制；原项目版权与许可声明依 MIT 要求在下文保留。
+- 本软件几乎所有代码全部由 AI 编写：hy4 与 DeepSeek V4.1 Flash，
+  包含全部 Java 源码、XML 布局与资源、构建脚本与全部文档文案。
+  人工负责需求、真机实测与反馈，未逐行审阅源码。
+- 本软件与字节跳动 / Trae 官方无任何关联、未获授权，所有 Trae 相关商标归其权利人所有。
+
+## 1. 本软件许可证
+
+本软件采用 MIT License 开源。
+
+Copyright (c) 2026 辉夜彩叶一休尼、我是八千代的狗
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## 2. 原版项目许可证全文（依 MIT 要求保留）
+
+项目：wb-checkin-android（WB签到助手）
+地址：https://github.com/Luckyboy-daidai/wb-checkin-android
+许可证：MIT
+版权声明：Copyright (c) 2026 闪光男孩小志
+
+MIT License
+
+Copyright (c) 2026 闪光男孩小志
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## 3. 引用链与上游
+
+原版项目的协议实现参考了 changexbc/workbuddy-switch
+（https://github.com/changexbc/workbuddy-switch，MIT，Copyright (c) 2026 wb-switch），
+本软件为间接参考，未使用其代码。引用链如下：
+
+Trae 签到助手（本软件，MIT）
+  └─ 直接参考：wb-checkin-android（MIT，Copyright (c) 2026 闪光男孩小志）
+        └─ 其协议实现参考：workbuddy-switch（MIT，Copyright (c) 2026 wb-switch）
+
+以下项目用于确认 Trae 客户端接口契约、设备号形态与错误码语义。
+本软件仅参考其公开可观察的接口行为与错误码语义，未复制、未翻译其源码，在此列名致谢：
+
+- Maquer/trae-signin（MIT）：SOLO OAuth 登录链路与 client_id 形态
+- xiaoyinge/trae-signin-gui（仓库未声明许可证）：设备号分配、machine_id 生成、
+  最小请求头集合、9074 / 9095 语义
+- cowpy/TRAE-Automatic-sign-in（GPL-3.0）：签到接口早期调研
+
+本软件为 MIT 许可。上述 GPL-3.0 项目与未声明许可证的项目均无代码被引入；
+若未来引入其代码，须按各自许可证重新评估整体许可兼容性。
+各项目版权归其作者所有，详见仓库 THIRD-PARTY-NOTICES.md。
+
+## 4. 第三方依赖
+
+本应用为纯 Android SDK 原生实现（Java + XML），无 Gradle 依赖、无 androidx、
+无第三方库、无广告或统计 SDK，因此不存在需要额外声明的第三方依赖许可证。
+org.json 由 Android 平台提供。
+
+## 5. 图标与截图
+
+- 启动图标与通知小图标：自行绘制生成，随本软件 MIT 许可
+- res/drawable 下全部图标：自制 vector / shape XML
+- 界面预览图：由 XML 布局渲染生成，不含任何个人信息
+- 字体：使用 Android 系统默认字体，未打包第三方字体
+
+## 6. 构建方式
+
+本仓库不含 Gradle 工程文件，使用 build.sh 直接调用 Android SDK 构建工具：
+
+- aapt2 compile / link
+- javac --release 8
+- d8
+- zip 塞入 classes.dex
+- zipalign
+- apksigner sign / verify
+
+依赖 JDK 17+、Android SDK build-tools 34.0.0 与 platforms android-34。
+仓库不含 APK 签名私钥。build.sh 的签名凭据通过 SIGNING_KEYSTORE /
+SIGNING_STORE_PASS / SIGNING_KEY_PASS 等环境变量提供，脚本内不含任何口令；
+未配置时仅生成一次性调试密钥，产物不可用于发布或覆盖安装官方 Release 版本。
+
+## 7. 参与贡献
+
+欢迎通过开源仓库提交 Issue 与 Pull Request。提交前请确认：
+
+- 不引入任何第三方依赖，保持零 Gradle、纯原生实现
+- 不提交 keystore、token、cookie 或任何真实账号数据
+- 新增功能需附带中文说明与对应的设置项文案
+- 提交前运行 bash build.sh 验证可构建
+- 参考或引入第三方代码 / 文案 / 图片时，同步更新 THIRD-PARTY-NOTICES.md
+
+## 8. 反馈
+
+问题反馈请附上机型、Android 版本、应用版本与长按日志复制出的完整报错。
+日志输出不含登录凭据，可安全用于公开反馈。请勿在公开渠道粘贴 token、
+refreshToken、cookie 或 storage.json 完整内容。
