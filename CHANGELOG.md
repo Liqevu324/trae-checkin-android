@@ -104,3 +104,16 @@
   （私有方法 `#foo(){}`、`??=`）的问题，对 `8049.*.js` 做语法降级
 - 修复第三方登录 `window.open` 弹窗不可见
 - 修复 OPPO 上通知权限弹窗与自动签到开关保存
+
+## v2.0.0（versionCode 2，据早期构建记录补充）
+
+- 推倒重做为纯 Java + XML 原生界面：移除 WebView / JSBridge / `assets/` / HTML，
+  改为签到 / 积分 / 日志 / 设置四 Tab
+- 新增 `Prefs`、`AutoScheduler`、42 个 drawable、5 档原生图标；
+  `BootReceiver` 支持应用更新后恢复排程
+- APK 约 137 KB
+
+## v1.0.0（versionCode 1，据早期构建记录补充）
+
+- 初版：双 WebView + JSBridge + HTML 界面，完成多账号登录、`AccountStore`、
+  `TraeApi`、JWT 别名解析、定时签到、签到历史、通知与免责声明

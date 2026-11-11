@@ -274,6 +274,26 @@ trae-checkin-android/
 - **安全边界**：OAuth 回调校验、WebView Host 白名单、剪贴板导出、后台线程等已知限制见
   [SECURITY.md](SECURITY.md)。
 
+## 版本线
+
+| 版本 | versionCode | 核心变化 |
+|---|---:|---|
+| 1.0.0 | 1 | 初版：双 WebView + JSBridge + HTML 界面，完成多账号登录、`AccountStore`、`TraeApi`、JWT 别名解析、定时签到、签到历史、通知与免责声明 |
+| 2.0.0 | 2 | 推倒重做：移除 WebView / JSBridge / HTML，改为纯 Java + XML 原生四 Tab（签到 / 积分 / 日志 / 设置）；新增 `Prefs`、`AutoScheduler`、42 个 drawable、5 档原生图标；`BootReceiver` 支持应用更新后恢复排程；APK 约 137 KB |
+| 2.1.0 | 3 | 修复登录：改用官方 `/login`，移除 JSBridge 改 Cookie 探针换 token，修复添加账号黑屏、Chrome/83 的 ES2022 语法兼容、第三方登录弹窗、OPPO 通知权限与开关回弹 |
+| 2.1.1 | 4 | 修复「假成功」：新增 `CheckinResult`，只有 `checked_in=true` 才记成功；失败尝试也写入历史 |
+| 2.1.2 | 5 | 长按日志可复制完整报错（`app_version / account / time / result / code / remaining`），不再被省略号截断 |
+| 2.2.0 | 6 | 登录链路改为官方 SOLO OAuth（`/authorization` + `RefreshToken → ExchangeToken`）；`device_id` 改为 12~20 位纯数字、`req_source=2`、积分改读服务端账本、`code=0` 后回查 `checked_in`，补齐 `9074 / 9095 / 1001` 处理 |
+| 2.3.0 | 7 | 让纯手机签到真正跑通：去掉与授权页矛盾的 `x-device-brand=Windows` 等请求头、`machine_id` 改为独立 32 位 hex、新增「设置设备号」、手动设备号不轮换、`9074` 自动换号限频、日志增加 `device_id / device_src / req_source` 诊断字段 |
+| 2.4.0 | 8 | 界面与设置大升级：5 组分组式设置、每日 03:30 凭证保活、积分到期提醒、排除账号、账号 JSON 导入导出、4 份内置中文文档、关于区、全局转场动画、配色对齐参考项目 |
+| 2.4.1 | 9 | 开发者改为双署名；移除积分到期提醒（积分 30 天才过期，提醒意义不大）；补齐开源声明材料 |
+| 2.4.2 | 10 | 开源前合规与文档修订：移除文档中的 `storage.json` 提取教程、移除与 MIT 冲突的「禁止商用」、补齐参考项目许可证列、语气中性化、换真机截图、整理为完整开源仓库；零业务逻辑改动，签名未轮换 |
+
+> 1.0.0 / 2.0.0 据早期构建记录补充，未写入正式 `CHANGELOG.md`；2.1.0 起来自 `CHANGELOG.md`。
+> 2.2.0 到 2.4.2 使用同一把签名私钥，可直接覆盖安装；1.0.0 / 2.0.0 / 2.1.x 的 APK 未保留。
+
+主线：1.0 验证想法（WebView / HTML）→ 2.0 重写原生 → 2.1.x 修登录、假成功与日志 → 2.2.0 换官方 SOLO OAuth → 2.3.0 攻克 9074 → 2.4.0 做好界面与设置 → 2.4.1 / 2.4.2 精简与开源收尾。
+
 ## FAQ
 
 **Q：支持哪些登录方式？**
