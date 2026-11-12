@@ -64,6 +64,27 @@ ANDROID_SDK=/path/to/android-sdk bash build.sh
 - 参考了哪个上游模块，在注释里注明（现有 `TraeApi.java` / `LoginActivity.java` 已这么做）。
 - 文档用 Markdown，事实用表格；**只写确实知道的事实**，无法确认的内容请注明「待确认」并说明原因，不要编造。
 
+## 7. 设备号与重新登录不变量（核心回归项）
+
+任何涉及 `deviceId` / 登录 / 账号存储的改动，必须保持以下不变量：
+
+1. **重新登录沿用旧号**：`LoginActivity.startNewAuthorization()` 在 `replaceId != null` 时
+   必须复用账号已有的 `device_id` 与 `machine_id`，无论旧号是手动还是自动；只有新账号才生成新号。
+2. **成功领取后锁定**：`CheckinEngine` 在 `claimed=true` 时把 `deviceIdVerified` 置为 true；
+   已验证号或手动号遇到 `9074` 时不得自动调用 `rotateDeviceId`，只能提示用户设置设备号。
+3. **换号必须清零**：任何修改 `deviceId` 的路径（手动设置、自动轮换、迁移、重新登录、导入）
+   都必须把 `deviceIdVerified` 置为 false；`AccountStore.update()` 有强制兜底，不要绕过它直接写 JSON。
+4. **新号必须唯一且合法**：新增 / 导入账号使用 12~20 位纯数字，并避开已有账号的设备号，避免 `9095`。
+5. **旧数据兼容**：没有 `device_id_verified` 字段的旧账号，合法设备号按已验证处理，
+   避免升级后第一次 `9074` 就换掉历史可用号。
+
+改动后至少验证四条路径：
+
+- 全新安装 → 首次登录 → 签到成功（积分到账）；
+- 老账号 → 重新登录 → 签到成功，日志 `device_id` 与重登录前一致；
+- 已中招账号 → 设置旧设备号为手动号 → 重新登录 → 签到成功；
+- 多账号 / 导入账号 → 设备号不撞号，日志 `device_verified` 符合预期。
+
 ---
 
 个人项目、随缘维护，可能不会及时回复；但每一条反馈都会被看到，感谢参与。
