@@ -35,3 +35,5 @@ versionCode: 9
 第三方辅助工具，与字节跳动 / Trae 官方无关联、未获授权，仅供学习研究。
 许多代码直接参考 https://github.com/Luckyboy-daidai/wb-checkin-android ；
 代码主要由 AI（hy4 与 DeepSeek V4.1 Flash）编写。MIT License。
+
+> 历史版本归档：仅提供 APK 与更新说明；该版本源码未单独保留，仓库源码以当前 `main` 为准。
