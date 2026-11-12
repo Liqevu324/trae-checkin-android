@@ -156,6 +156,7 @@
     <string name="checkin_err_claim_fmt">领取失败（code=%1$d）</string>
     <string name="checkin_err_device_rejected">设备校验未通过（9074）。自动生成设备号不被上游认可，请在账号菜单点「设置设备号」填入电脑版 TRAE 的真实设备号</string>
     <string name="checkin_err_device_rejected_manual">设备校验未通过（9074），已用手动设备号重试仍失败；请确认号码与电脑版 TRAE 一致，或重新登录后再试</string>
+    <string name="checkin_err_device_rejected_verified">设备校验未通过（9074）。该设备号此前已能正常签到，已停止自动换号以免丢失绑定；请保持原号重试，仍失败时在账号菜单「设置设备号」填入电脑版 TRAE 的真实设备号</string>
     <string name="checkin_err_device_rejected_rotated">设备校验未通过（9074），已自动换号重试仍失败；请在账号菜单点「设置设备号」填入真实设备号</string>
     <string name="checkin_err_device_already">当前设备今日已签到（9095），请明日再试</string>
     <string name="checkin_err_device_register">设备未注册（9004），请重新登录账号完成设备绑定</string>

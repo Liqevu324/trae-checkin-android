@@ -122,6 +122,9 @@ public class CheckinEngine {
             a.remaining = remaining;
             a.lastCheckTime = System.currentTimeMillis();
             if (checkedIn) a.lastCheckinDate = today;
+            // 只有真正领取成功（含 9095 回查确认已签）才把当前设备号标记为已验证。
+            // 以后 9074 时绝不自动换掉这个号。
+            if (claimed) a.deviceIdVerified = true;
             if (claimed) {
                 message = ctx.getString(R.string.checkin_msg_success);
                 store.addHistory(a, todayCredits, remaining);
@@ -267,9 +270,11 @@ public class CheckinEngine {
             //  2) 自动号一天最多自动换一次 —— 每轮都换会污染凭证、掩盖真因。
             // 手机端没有桌面客户端，自动生成的号本就很难通过上游绑定校验，
             // 所以最终处置是引导用户去「设置设备号」填一次真机号。
-            if (a.deviceIdManual) {
+            if (a.deviceIdManual || a.deviceIdVerified) {
                 result.code = 9074;
-                result.message = ctx.getString(R.string.checkin_err_device_rejected_manual);
+                result.message = ctx.getString(a.deviceIdManual
+                        ? R.string.checkin_err_device_rejected_manual
+                        : R.string.checkin_err_device_rejected_verified);
                 return result;
             }
             long now = System.currentTimeMillis();
@@ -289,6 +294,7 @@ public class CheckinEngine {
             String rotated = AccountStore.rotateDeviceId(a.deviceId, used);
             a.deviceId = rotated;
             a.deviceRotatedAt = now;
+            a.deviceIdVerified = false;
             store.update(a);
             result.deviceRotated = true;
             resp = TraeApi.claim(a.token, a.deviceId);

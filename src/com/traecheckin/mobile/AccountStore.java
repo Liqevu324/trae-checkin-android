@@ -66,6 +66,13 @@ public class AccountStore {
         public boolean deviceIdManual = false;
         /** 上次因 9074 自动换号的时间戳（毫秒），用于 24 小时限频。 */
         public long deviceRotatedAt = 0L;
+        /**
+         * 当前设备号是否已经过一次成功领取验证。
+         *
+         * <p>已验证的号在 9074 时绝不自动轮换：自动换号会把上游唯一认可的
+         * 绑定换掉，导致原本能签到的账号永久 9074。设备号变化时必须清零。</p>
+         */
+        public boolean deviceIdVerified = false;
 
         JSONObject toJson() {
             JSONObject o = new JSONObject();
@@ -89,6 +96,7 @@ public class AccountStore {
                 o.put("machine_id", machineId);
                 o.put("device_id_manual", deviceIdManual);
                 o.put("device_rotated_at", deviceRotatedAt);
+                o.put("device_id_verified", deviceIdVerified);
             } catch (Exception ignored) {
             }
             return o;
@@ -116,6 +124,11 @@ public class AccountStore {
             a.machineId = o.optString("machine_id");
             a.deviceIdManual = o.optBoolean("device_id_manual", false);
             a.deviceRotatedAt = o.optLong("device_rotated_at", 0L);
+            // 旧版 JSON 没有该字段：已有合法设备号视为已验证，避免升级后
+            // 第一次 9074 就把历史账号的可用号自动换掉。
+            a.deviceIdVerified = o.has("device_id_verified")
+                    ? o.optBoolean("device_id_verified", false)
+                    : isValidDeviceId(a.deviceId);
             return a;
         }
 
@@ -290,15 +303,23 @@ public class AccountStore {
      */
     public synchronized Account add(String token, String deviceId, String alias) {
         JSONArray arr = accountsArr();
+        List<String> used = new ArrayList<String>();
+        for (int i = 0; i < arr.length(); i++) {
+            Account old = Account.fromJson(arr.optJSONObject(i));
+            if (old != null && old.deviceId != null) used.add(old.deviceId);
+        }
         Account a = new Account();
         a.id = "a" + System.currentTimeMillis() + "_" + (int) (Math.random() * 10000);
         a.token = token;
-        a.deviceId = (deviceId == null || deviceId.length() == 0) ? newDeviceId() : deviceId;
+        // 新账号只接受合法且不撞号的设备号；否则生成一个唯一号，避免 9095。
+        a.deviceId = isValidDeviceId(deviceId) && !used.contains(deviceId)
+                ? deviceId : newDeviceId(used);
         a.addedAt = System.currentTimeMillis();
         a.alias = (alias == null || alias.trim().length() == 0)
                 ? aliasFromToken(token, arr.length() + 1) : alias.trim();
         a.checkedIn = false;
         a.tokenValid = true;
+        a.deviceIdVerified = false;
         a.lastMessage = "";
         arr.put(a.toJson());
         persist();
@@ -323,6 +344,15 @@ public class AccountStore {
         }
         String base = randomNumericDeviceId();
         return uniqueSibling(base, used);
+    }
+
+    /** 生成一个不与当前已保存账号撞号的设备号。 */
+    public synchronized String newUniqueDeviceId() {
+        List<String> used = new ArrayList<String>();
+        for (Account a : accounts()) {
+            if (a != null && a.deviceId != null) used.add(a.deviceId);
+        }
+        return newDeviceId(used);
     }
 
     /** 设备号是否符合官方客户端形态：12~20 位纯数字。 */
@@ -395,6 +425,7 @@ public class AccountStore {
             try {
                 o.put("device_id", deviceId);
                 o.put("device_id_manual", manual);
+                o.put("device_id_verified", false);
                 o.put("device_rotated_at", 0L);
                 o.put("checked_in", false);
                 o.put("last_checkin_date", "");
@@ -490,6 +521,7 @@ public class AccountStore {
                 }
                 String fresh = stableDeviceId(accountId + "|" + uid + "|" + id, used);
                 o.put("device_id", fresh);
+                o.put("device_id_verified", false);
                 o.put("last_message", "");
                 o.put("token_valid", true);
                 used.add(fresh);
@@ -574,12 +606,21 @@ public class AccountStore {
             JSONObject o = arr.optJSONObject(i);
             if (o == null || !o.optString("id").equals(id)) continue;
             try {
+                String oldDeviceId = o.optString("device_id");
+                boolean oldVerified = o.has("device_id_verified")
+                        ? o.optBoolean("device_id_verified", false)
+                        : isValidDeviceId(oldDeviceId);
                 o.put("token", token);
                 if (refreshToken != null && refreshToken.length() > 0) {
                     o.put("refresh_token", refreshToken);
                 }
                 if (expiresAt > 0L) o.put("expires_at", expiresAt);
-                if (isValidDeviceId(deviceId)) o.put("device_id", deviceId);
+                if (isValidDeviceId(deviceId)) {
+                    o.put("device_id", deviceId);
+                    // 同号重新登录保留“已验证”；换号必须重新验证，不能继承旧标记。
+                    o.put("device_id_verified",
+                            deviceId.equals(oldDeviceId) ? oldVerified : false);
+                }
                 if (machineId != null && machineId.length() > 0) {
                     o.put("machine_id", machineId);
                 }
@@ -661,14 +702,18 @@ public class AccountStore {
             if (findToken(a.token) != null) continue;
             if (uid != null && uid.length() > 0 && findByUid(uid) != null) continue;
 
-            // 用 add() 生成新的稳定 id，再补齐 OAuth 凭证字段
-            Account fresh = add(a.token, a.deviceId, a.alias);
+            // 用 add() 生成新的稳定 id，再补齐 OAuth 凭证字段。
+            // 如果导入的设备号非法/撞号，add() 会换新号，此时不能继承“已验证”。
+            String importedDeviceId = a.deviceId == null ? "" : a.deviceId;
+            Account fresh = add(a.token, importedDeviceId, a.alias);
             fresh.cookie = a.cookie == null ? "" : a.cookie;
             fresh.uid = uid == null ? "" : uid;
             fresh.refreshToken = a.refreshToken == null ? "" : a.refreshToken;
             fresh.expiresAt = a.expiresAt;
             fresh.machineId = a.machineId == null ? "" : a.machineId;
-            fresh.deviceIdManual = a.deviceIdManual;
+            boolean deviceKept = importedDeviceId.equals(fresh.deviceId);
+            fresh.deviceIdManual = deviceKept && a.deviceIdManual;
+            fresh.deviceIdVerified = deviceKept && a.deviceIdVerified;
             fresh.tokenValid = true;
             fresh.checkedIn = false;
             fresh.lastCheckinDate = "";
@@ -748,6 +793,7 @@ public class AccountStore {
             item.put("device_id", a.deviceId == null ? "" : a.deviceId);
             item.put("device_src", a.deviceIdManual ? "manual" : "auto");
             item.put("device_rotated", a.deviceRotatedAt > 0L);
+            item.put("device_verified", a.deviceIdVerified);
             item.put("req_source", 2);
             JSONArray out = new JSONArray();
             out.put(item);

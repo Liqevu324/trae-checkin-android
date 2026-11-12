@@ -580,22 +580,32 @@ public class LoginActivity extends Activity {
             }
         } catch (Throwable ignored) {
         }
-        // 用户手动设置的真机号必须原样沿用：重新登录会重新走授权页，若这里又
-        // 随机生成一个新号，上游注册的是新号、真机号反而被覆盖，9074 永远修不好。
-        String manualId = null;
+        // 重新登录必须沿用旧设备号（手动或自动都一样）：上游只认第一次登录时
+        // 注册/已验证的那个号，重新生成会自动换号，导致 claim 稳定 9074。
+        // 只有新账号（replaceId == null）才生成新号。
+        String existingDeviceId = null;
+        String existingMachineId = null;
         if (replaceId != null) {
             try {
                 AccountStore.Account old = store.byId(replaceId);
-                if (old != null && old.deviceIdManual
-                        && AccountStore.isValidDeviceId(old.deviceId)) manualId = old.deviceId;
+                if (old != null && AccountStore.isValidDeviceId(old.deviceId)) {
+                    existingDeviceId = old.deviceId;
+                }
+                if (old != null && old.machineId != null
+                        && old.machineId.matches("[0-9a-fA-F]{32}")) {
+                    existingMachineId = old.machineId;
+                }
             } catch (Throwable ignored) {
             }
         }
-        oauthDeviceId = manualId != null ? manualId : AccountStore.newDeviceId(used);
+        oauthDeviceId = existingDeviceId != null
+                ? existingDeviceId : AccountStore.newDeviceId(used);
         // 对齐官方完整实现（xiaoyinge/trae-signin-gui login.rs::gen_machine_id）：
         // machine_id 是独立的 32 位 hex，device_id 才是 12~20 位纯数字 Aha 号。
         // claim 请求不带 machine_id（upstream.rs 有单元测试断言），它只影响授权页。
-        oauthMachineId = UUID.randomUUID().toString().replace("-", "");
+        // 重新登录时同样沿用旧 machine_id，避免授权指纹与旧绑定不一致。
+        oauthMachineId = existingMachineId != null
+                ? existingMachineId : UUID.randomUUID().toString().replace("-", "");
         oauthCallbackHandled = false;
         tokenHandled = false;
         verifying = false;
@@ -1744,7 +1754,7 @@ public class LoginActivity extends Activity {
         final AuthBundle auth = pendingAuth;
         final String cookie = auth.cookie == null ? "" : auth.cookie;
         final String deviceId = AccountStore.isValidDeviceId(auth.deviceId)
-                ? auth.deviceId : AccountStore.newDeviceId();
+                ? auth.deviceId : store.newUniqueDeviceId();
         final String uid = auth.uid.length() > 0
                 ? auth.uid : AccountStore.uidFromToken(token);
 
