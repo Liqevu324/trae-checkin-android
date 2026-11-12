@@ -8,7 +8,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![minSdk 24](https://img.shields.io/badge/minSdk-24-green.svg)
 ![Java 8](https://img.shields.io/badge/Java-8-orange.svg)
-![零第三方依赖](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
+![no dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
 ![version 2.4.3](https://img.shields.io/badge/version-2.4.3-lightgrey.svg)
 ![Build](https://github.com/Liqevu324/trae-checkin-android/actions/workflows/build.yml/badge.svg)
 
