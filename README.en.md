@@ -115,7 +115,8 @@ The detailed documentation is currently in Chinese:
 - [Compatibility](docs/COMPATIBILITY.md): Android versions, Chinese ROM background settings, WebView
 - [APK archive & checksums](docs/APK-ARCHIVE.md): v2.2.0 → v2.4.3 SHA256, signature, install order
 - [Architecture](ARCHITECTURE.md), [privacy](PRIVACY.md), [security](SECURITY.md),
-  [third-party notices](THIRD-PARTY-NOTICES.md), [changelog](CHANGELOG.md)
+  [third-party notices](THIRD-PARTY-NOTICES.md), [changelog](CHANGELOG.md),
+  [v2.4.3 release notes](docs/RELEASE_NOTES_v2.4.3.md)
 
 ## Related projects
 

@@ -226,11 +226,12 @@ trae-checkin-android/
 ├── build.sh                       # 一键构建脚本
 ├── TraeCheckin.apk                # 本地构建产物，不入库；从 Releases 下载
 ├── .github/                       # Issue / PR 模板、CI（build.yml）、CODEOWNERS
-├── docs/                          # Release Notes、APK 校验值、签名证书
-├── screenshots/                   # 真机截图
+├── docs/                          # Release Notes、排障/迁移/兼容性、APK 校验值、签名证书
+├── screenshots/                   # 真机截图（含添加账号流程）
 ├── CODE_OF_CONDUCT.md
 ├── LICENSE
 ├── README.md
+├── README.en.md
 ├── res/
 │   ├── layout/                    # 原生 XML 布局（主界面 / 登录 / 积分 / 日志 / 设置 / 文档 + 列表项）
 │   ├── drawable/                  # 纯 shape / vector 资源
