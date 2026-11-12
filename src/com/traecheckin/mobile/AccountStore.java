@@ -737,6 +737,10 @@ public class AccountStore {
             item.put("success", success);
             item.put("message", message == null ? "" : message);
             item.put("code", code);
+            // code 是上游业务码；网络失败时没有业务码，code=0 不代表成功。
+            if (!success && NetHelper.isNetworkMessage(message)) {
+                item.put("error_type", "network");
+            }
             item.put("credits", credits);
             item.put("remaining", remaining);
             // 排障字段：9074 是设备号校验，日志必须带上号与来源才能定位。

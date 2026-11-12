@@ -35,6 +35,20 @@ public final class AutoScheduler {
     public static final int REQUEST_CODE = 1001;
     /** MaintenanceReceiver（每日凭证保活）的 PendingIntent 请求码。 */
     public static final int KEEP_ALIVE_REQUEST_CODE = 1002;
+    /** 网络失败补签使用独立 action / 请求码，绝不覆盖每日正常闹钟。 */
+    public static final int NETWORK_RETRY_REQUEST_CODE = 1003;
+    public static final String ACTION_NETWORK_RETRY =
+            "com.traecheckin.mobile.action.NETWORK_RETRY";
+    public static final String EXTRA_RETRY_COUNT = "retry_count";
+    public static final int MAX_NETWORK_RETRIES = 3;
+    /**
+     * 补签间隔逐次拉长：15 分钟 / 30 分钟 / 60 分钟。
+     * 夜间断网多半是手机进入 Doze 后 Wi-Fi 休眠，密集重试会在同一个休眠窗口里连续失败；
+     * 拉长间隔可以让 3 次重试跨越约 1 小时 45 分钟，等设备短暂唤醒或网络自行恢复。
+     */
+    private static final long[] NETWORK_RETRY_DELAYS_MS = {
+            15L * 60L * 1000L, 30L * 60L * 1000L, 60L * 60L * 1000L
+    };
 
     private AutoScheduler() {
     }
@@ -83,6 +97,16 @@ public final class AutoScheduler {
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;
         if (Build.VERSION.SDK_INT >= 23) flags |= PendingIntent.FLAG_IMMUTABLE;
         return PendingIntent.getBroadcast(ctx, REQUEST_CODE, i, flags);
+    }
+
+    /** 网络失败补签闹钟；extras 更新不会改变 PendingIntent 的身份。 */
+    public static PendingIntent networkRetryPendingIntent(Context ctx, int retryCount) {
+        Intent i = new Intent(ctx, CheckinReceiver.class);
+        i.setAction(ACTION_NETWORK_RETRY);
+        i.putExtra(EXTRA_RETRY_COUNT, retryCount);
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= 23) flags |= PendingIntent.FLAG_IMMUTABLE;
+        return PendingIntent.getBroadcast(ctx, NETWORK_RETRY_REQUEST_CODE, i, flags);
     }
 
     /** 探测是否已有排程中的闹钟；不创建新的 PendingIntent。 */
@@ -211,7 +235,10 @@ public final class AutoScheduler {
     }
 
     private static void setAlarm(Context app, AlarmManager am, PendingIntent pi) {
-        long triggerAt = nextTriggerAt(app);
+        setAlarmAt(app, am, nextTriggerAt(app), pi);
+    }
+
+    private static void setAlarmAt(Context app, AlarmManager am, long triggerAt, PendingIntent pi) {
         try {
             if (canScheduleExact(app)) {
                 am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
@@ -225,6 +252,53 @@ public final class AutoScheduler {
             } catch (Exception ignored) {
             }
         } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * 第 n 次补签相对上一次的等待时间。
+     * @param retryCount 即将执行的补签序号（1 起）
+     */
+    public static long networkRetryDelayMs(int retryCount) {
+        int idx = Math.max(0, Math.min(retryCount, NETWORK_RETRY_DELAYS_MS.length) - 1);
+        return NETWORK_RETRY_DELAYS_MS[idx];
+    }
+
+    /** 补签间隔的展示文案，例如「15 分钟」「1 小时」。 */
+    public static String networkRetryDelayLabel(int retryCount) {
+        long minutes = networkRetryDelayMs(retryCount) / 60_000L;
+        if (minutes >= 60 && minutes % 60 == 0) return (minutes / 60) + " 小时";
+        return minutes + " 分钟";
+    }
+
+    /**
+     * 网络失败后按 15/30/60 分钟补签，最多 3 次。业务错误（9074/1001 等）不进入此流程。
+     * @return 是否成功提交了补签闹钟
+     */
+    public static boolean scheduleNetworkRetry(Context ctx, int nextRetryCount) {
+        Context app = ctx.getApplicationContext();
+        if (nextRetryCount < 1 || nextRetryCount > MAX_NETWORK_RETRIES) {
+            cancelNetworkRetry(app);
+            return false;
+        }
+        try {
+            AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+            if (am == null) return false;
+            PendingIntent pi = networkRetryPendingIntent(app, nextRetryCount);
+            setAlarmAt(app, am, System.currentTimeMillis() + networkRetryDelayMs(nextRetryCount), pi);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** 签到已成功或达到补签上限后，清理独立补签闹钟。 */
+    public static void cancelNetworkRetry(Context ctx) {
+        Context app = ctx.getApplicationContext();
+        try {
+            AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+            if (am != null) am.cancel(networkRetryPendingIntent(app, 0));
+        } catch (Throwable ignored) {
         }
     }
 

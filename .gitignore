@@ -18,8 +18,3 @@ keystore.properties
 # APK 作为 GitHub Release 附件发布，不提交进仓库（避免二进制入库）
 # release/ 目录下的预构建 APK 同样被忽略，请通过 Release 页面上传。
 *.apk
-*.aab
-
-# 本地私密笔记 / 交接材料
-private-notes/
-*.zip

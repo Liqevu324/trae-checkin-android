@@ -245,6 +245,16 @@ public class LogsActivity extends Activity {
                 .format(new Date(time))).append('\n');
         text.append("result=").append(result).append('\n');
         text.append("code=").append(item.optInt("code", 0)).append('\n');
+        String errorType = item.optString("error_type", "");
+        if (errorType.length() == 0 && NetHelper.isNetworkMessage(item.optString("message", ""))) {
+            errorType = "network";
+        }
+        if (errorType.length() > 0) {
+            text.append("error_type=").append(errorType).append('\n');
+            if ("network".equals(errorType) && item.optInt("code", 0) == 0) {
+                text.append("code_note=网络失败时没有上游业务码，0 不代表签到成功\n");
+            }
+        }
         double remaining = item.optDouble("remaining", -1d);
         text.append("remaining=").append(remaining >= 0 ? formatCredits(remaining)
                 : getString(R.string.placeholder_empty));

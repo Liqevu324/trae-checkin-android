@@ -44,6 +44,36 @@ public class TraeApi {
 
     /** 返回 JSONObject；__http 为 HTTP 状态码；__error 为网络层错误。 */
     static JSONObject request(String path, String token, String deviceId, String bodyJson) {
+        return request(path, token, deviceId, bodyJson, false);
+    }
+
+    /**
+     * 状态查询与领取允许最多 3 次网络尝试（首次 + 2 次短退避重试）。
+     * 只重试 __error，不重试 HTTP / 业务错误；claim 在上游按天幂等，配合最终 status 回查。
+     */
+    private static JSONObject request(String path, String token, String deviceId,
+                                      String bodyJson, boolean retryNetwork) {
+        int maxAttempts = retryNetwork ? 3 : 1;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            JSONObject r = requestUrl(BASE + path, token, deviceId, bodyJson);
+            try {
+                r.put("__attempts", attempt);
+            } catch (Exception ignored) {
+            }
+            if (!r.has("__error") || attempt >= maxAttempts) return r;
+            try {
+                Thread.sleep(attempt == 1 ? 3000L : 8000L);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                JSONObject stopped = new JSONObject();
+                try {
+                    stopped.put("__error", "网络请求已中断");
+                    stopped.put("__attempts", attempt);
+                } catch (Exception ignored) {
+                }
+                return stopped;
+            }
+        }
         return requestUrl(BASE + path, token, deviceId, bodyJson);
     }
 
@@ -104,14 +134,16 @@ public class TraeApi {
         return s.hasNext() ? s.next() : "";
     }
 
-    /** 查询今日签到状态。 */
+    /** 查询今日签到状态；短暂 DNS / 连接 / 超时错误自动做有限次重试。 */
     public static JSONObject status(String token, String deviceId) {
-        return request("/trae/api/v2/ug/checkin_credits/status", token, deviceId, CHECKIN_BODY);
+        return request("/trae/api/v2/ug/checkin_credits/status", token, deviceId,
+                CHECKIN_BODY, true);
     }
 
-    /** 领取今日签到积分（每天一次，重复调用幂等）。 */
+    /** 领取今日签到积分（每天一次，重复调用幂等）；网络错误最多尝试 3 次。 */
     public static JSONObject claim(String token, String deviceId) {
-        return request("/trae/api/v2/ug/checkin_credits/claim", token, deviceId, CHECKIN_BODY);
+        return request("/trae/api/v2/ug/checkin_credits/claim", token, deviceId,
+                CHECKIN_BODY, true);
     }
 
     /**

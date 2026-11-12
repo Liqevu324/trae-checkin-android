@@ -162,7 +162,7 @@ WorkManager 均为 Apache-2.0，本项目未使用，故不适用）。
 |---|---|---|
 | 启动图标 `mipmap-*/ic_launcher.png`、通知小图标 `ic_stat.png` | 由本项目自行绘制生成 | 随本项目 MIT |
 | `res/drawable/*.xml` 全部图标 | 自制 vector / shape XML | 随本项目 MIT |
-| `screenshots/*.jpg` 界面预览 | 真机截图（由使用者提供），已去除 EXIF 元数据；不含手机号、邮箱、token、cookie 或设备号，仅显示用户自设账号别名与截图时积分余额 | 随本项目 MIT |
+| `screenshots/*.png` 界面预览 | 由本项目 XML 布局渲染生成，非真机截图、不含任何个人信息 | 随本项目 MIT |
 | 字体 | 使用 Android 系统默认字体，未打包第三方字体 | 不适用 |
 
 ---
@@ -171,7 +171,7 @@ WorkManager 均为 Apache-2.0，本项目未使用，故不适用）。
 
 - 本项目**明确承认**有许多代码与结构直接参考了 `wb-checkin-android`；
   相应的版权与 MIT 许可全文已按许可证要求在本文件保留。
-- 本项目代码主要由 AI 生成，详见 [`AI-USAGE.md`](AI-USAGE.md)；AI 生成过程参考了上述项目，
+- 本项目几乎全部代码由 AI 生成，详见 [`AI-USAGE.md`](AI-USAGE.md)；AI 生成过程参考了上述项目，
   不意味着这些项目的作者参与或认可本项目。
 - 本项目与 Trae / 字节跳动官方**无任何关联、未获授权**，所有 Trae 相关商标归其权利人所有。
 - 若任何第三方权利人认为本声明或代码引用存在问题，请通过仓库 Issue 联系，核实后将及时更正或移除。

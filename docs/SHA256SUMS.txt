@@ -1,1 +1,8 @@
+# TraeCheckin APK SHA256
+# 全部版本使用同一签名证书，证书 SHA-256 见 SIGNING-CERT.txt。
+da0ea7ac3bd406c6fa4e9e48e5320bc54a503e3678ab7d3fe50173fe2e62e518  TraeCheckin-2.2.0.apk
+93ab74df9d6c686001358dcaa909601079f84f35cc35f458789f63fe6f12eb55  TraeCheckin-2.3.0.apk
+b637ce1b0c2c6dc760719cbf6c51c05c7a0454b8ea4778a3d7816ae7579ca717  TraeCheckin-2.4.0.apk
+3c5addfb55a92df2bc9bec3f50501ac780588b0e1b3c765ec8ae181090cb77b4  TraeCheckin-2.4.1.apk
 48a74c12d81bfa86e6e1f78b429cd256ee5a968ef3e7827f654dac24066e7e5d  TraeCheckin-2.4.2.apk
+849abc9e8873006ce008ce70fd42a9c713da69dc108d6dbdac824dde6622323a  TraeCheckin-2.4.3.apk

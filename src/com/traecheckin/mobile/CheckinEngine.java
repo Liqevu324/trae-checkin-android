@@ -28,8 +28,18 @@ public class CheckinEngine {
         try {
             out.put("account_id", a.id);
 
+            // Wi-Fi / 移动数据切换或刚从 Doze 唤醒时，网络可能尚未就绪。
+            // 先短等系统恢复；后续真实请求仍有有限次重试，不以预检代替请求。
+            if (!NetHelper.awaitNetwork(ctx, 15000L)) {
+                String detail = Thread.currentThread().isInterrupted()
+                        ? "网络请求已中断" : "当前无可用网络，请检查 Wi-Fi 或移动数据";
+                return fail(store, a, out,
+                        ctx.getString(R.string.checkin_err_network_fmt, detail), 0, doClaim);
+            }
+
             JSONObject st = TraeApi.status(a.token, a.deviceId);
             if (st.has("__error")) {
+                out.put("network_attempts", st.optInt("__attempts", 1));
                 return fail(store, a, out,
                         ctx.getString(R.string.checkin_err_network_fmt, st.optString("__error")),
                         0, doClaim);
@@ -38,10 +48,14 @@ public class CheckinEngine {
             int statusCode = TraeApi.intValue(st, "code", "Code");
             if ((http == 401 || statusCode == 1001) && ensureFreshToken(store, a)) {
                 st = TraeApi.status(a.token, a.deviceId);
-                if (!st.has("__error")) {
-                    http = st.optInt("__http", 0);
-                    statusCode = TraeApi.intValue(st, "code", "Code");
+                if (st.has("__error")) {
+                    out.put("network_attempts", st.optInt("__attempts", 1));
+                    return fail(store, a, out,
+                            ctx.getString(R.string.checkin_err_network_fmt, st.optString("__error")),
+                            0, doClaim);
                 }
+                http = st.optInt("__http", 0);
+                statusCode = TraeApi.intValue(st, "code", "Code");
             }
             if (http == 401 || statusCode == 1001) {
                 return fail(store, a, out, ctx.getString(R.string.checkin_err_login_expired),
@@ -77,6 +91,7 @@ public class CheckinEngine {
             double todayCredits = Math.max(0d,
                     TraeApi.doubleValue(st, "credits", "today_credits", "todayCredits"));
             boolean claimed = false;
+            boolean networkError = false;
             String message = "";
             int resultCode = 0;
 
@@ -84,6 +99,7 @@ public class CheckinEngine {
                 ClaimResult cr = performClaim(ctx, store, a);
                 claimed = cr.claimed;
                 checkedIn = claimed;
+                networkError = cr.network;
                 message = cr.message;
                 resultCode = cr.code;
                 if (cr.credits >= 0d) todayCredits = cr.credits;
@@ -128,6 +144,8 @@ public class CheckinEngine {
             out.put("credits", todayCredits);
             out.put("remaining", remaining);
             out.put("message", message);
+            out.put("network_error", networkError);
+            if (networkError) out.put("error_type", "network");
             if (resultCode != 0) out.put("code", resultCode);
             if (withDetail && detail.has("raw")) {
                 String raw = detail.optString("raw");
@@ -189,6 +207,17 @@ public class CheckinEngine {
         }
     }
 
+    /**
+     * 回查今日是否已签到。
+     * @return TRUE/FALSE 为服务端明确结论；null 表示网络或 HTTP 层无法确认，调用方应按原错误处理。
+     */
+    private static Boolean statusCheckedIn(AccountStore.Account a) {
+        JSONObject c = TraeApi.status(a.token, a.deviceId);
+        if (c == null || c.has("__error") || c.optInt("__http", 0) >= 400) return null;
+        if (!TraeApi.hasValue(c, "checked_in", "checkedIn")) return null;
+        return Boolean.valueOf(TraeApi.bool(c, "checked_in", "checkedIn"));
+    }
+
     /** 判断一次接口响应是否属于「凭证过期」（HTTP 401 或 code 1001）。 */
     static boolean isAuthError(JSONObject resp) {
         if (resp == null) return false;
@@ -219,7 +248,12 @@ public class CheckinEngine {
             }
             resp = TraeApi.claim(a.token, a.deviceId);
             readClaim(resp, result);
-            if (result.network || result.code == 1001 || result.http == 401) {
+            if (result.network) {
+                result.code = 0;
+                result.message = ctx.getString(R.string.checkin_err_network_fmt, result.message);
+                return result;
+            }
+            if (result.code == 1001 || result.http == 401) {
                 result.code = 1001;
                 result.message = ctx.getString(R.string.checkin_err_login_expired);
                 return result;
@@ -259,7 +293,12 @@ public class CheckinEngine {
             result.deviceRotated = true;
             resp = TraeApi.claim(a.token, a.deviceId);
             readClaim(resp, result);
-            if (result.network || result.code == 9074) {
+            if (result.network) {
+                result.code = 0;
+                result.message = ctx.getString(R.string.checkin_err_network_fmt, result.message);
+                return result;
+            }
+            if (result.code == 9074) {
                 result.code = 9074;
                 result.message = ctx.getString(R.string.checkin_err_device_rejected_rotated);
                 return result;
@@ -267,6 +306,17 @@ public class CheckinEngine {
         }
 
         if (result.code == 9095) {
+            // 9095 = 该设备今日已签到。可能来自两种情况：
+            //  1) 另一个账号占用了同一设备号（本次确实没签上）；
+            //  2) 上一次 claim 其实已被服务端受理，只是响应在网络上丢了，重试时命中幂等。
+            // 用 status 回查区分：本人今天已签到就按「已领取」处理，避免误记失败。
+            Boolean already = statusCheckedIn(a);
+            if (Boolean.TRUE.equals(already)) {
+                result.claimed = true;
+                result.code = 0;
+                result.message = ctx.getString(R.string.checkin_msg_already);
+                return result;
+            }
             result.message = ctx.getString(R.string.checkin_err_device_already);
             return result;
         }
@@ -291,7 +341,16 @@ public class CheckinEngine {
         }
 
         JSONObject confirm = TraeApi.status(a.token, a.deviceId);
-        if (confirm.has("__error") || confirm.optInt("__http", 0) >= 400
+        if (confirm.has("__error")) {
+            // claim 可能已被服务端接受，只是回查时断网；标记网络错误以便稍后补查，
+            // 后续补签会先读 status，已签到时不会重复领取。
+            result.network = true;
+            result.code = 0;
+            result.message = ctx.getString(R.string.checkin_err_network_fmt,
+                    confirm.optString("__error") + "；领取结果待回查");
+            return result;
+        }
+        if (confirm.optInt("__http", 0) >= 400
                 || !TraeApi.bool(confirm, "checked_in", "checkedIn")) {
             result.code = TraeApi.intValue(confirm, "code", "Code");
             result.message = ctx.getString(R.string.checkin_err_unconfirmed);
@@ -336,6 +395,9 @@ public class CheckinEngine {
         try {
             out.put("ok", false);
             out.put("message", message);
+            boolean network = NetHelper.isNetworkMessage(message);
+            out.put("network_error", network);
+            if (network) out.put("error_type", "network");
             if (!out.has("checked_in")) out.put("checked_in", false);
             if (!out.has("claimed")) out.put("claimed", false);
             out.put("remaining", a.remaining);

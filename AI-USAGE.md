@@ -2,7 +2,7 @@
 
 ## 结论先行
 
-**本项目代码主要由 AI 编写**，具体由以下两个模型完成：
+**本项目几乎所有代码全部由 AI 编写**，具体由以下两个模型完成：
 
 | 模型 | 说明 |
 |---|---|
@@ -16,7 +16,7 @@
 - `res/` 下全部 **XML 布局、drawable、values、anim、raw 内置文档**
 - `AndroidManifest.xml`、`build.sh` 构建脚本、`.gitignore`
 - `README.md`、`CHANGELOG.md`、`PRIVACY.md`、`THIRD-PARTY-NOTICES.md`、`SECURITY.md`、
-  `CONTRIBUTING.md`、`CODE_OF_CONDUCT.md` 以及本文件等**全部文档文案**
+  `CONTRIBUTING.md` 以及本文件等**全部文档文案**
 - 应用内四份中文文档（`doc_guide.txt` / `doc_privacy.txt` / `doc_terms.txt` / `doc_opensource.txt`）
 
 ## AI 用在哪些环节
@@ -48,11 +48,11 @@
 
 | 项 | 产出方式 |
 |---|---|
-| `signing.keystore` 签名私钥 | 由 JDK `keytool` 生成，非 AI 内容 |
+| 发布签名证书（不随仓库分发） | 由维护者使用 JDK `keytool` 生成，非 AI 内容 |
 | `TraeCheckin.apk` 成品 | 由 `aapt2 / javac / d8 / zipalign / apksigner` 构建链产出 |
-| `screenshots/*.jpg` 界面预览 | 真机截图（由使用者提供，已去除 EXIF 元数据） |
+| `screenshots/*.jpg` 真机截图 | 由使用者在 Android 真机上截取，已去除 EXIF |
 | 真机实测结论与报错日志 | 由使用者在手机上产生 |
-| 参考项目的公开源码与文档 | 用于核对参考范围与许可证声明 |
+| 上游参考项目拆解（不随仓库分发） | 由维护者整理，作为本次文档编写的依据 |
 
 ## 第三方参考与 AI 的关系
 

@@ -3,7 +3,7 @@
 # 依赖：JDK 17+、Android SDK (build-tools 34.0.0 + platforms;android-34)
 set -e
 
-SDK="${ANDROID_SDK:-${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/opt/android-sdk}}}"
+SDK="${ANDROID_SDK:-/opt/android-sdk}"
 BT="$SDK/build-tools/34.0.0"
 PLATFORM="$SDK/platforms/android-34/android.jar"
 

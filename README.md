@@ -7,8 +7,7 @@
 ![minSdk 24](https://img.shields.io/badge/minSdk-24-green.svg)
 ![Java 8](https://img.shields.io/badge/Java-8-orange.svg)
 ![零第三方依赖](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
-![version 2.4.2](https://img.shields.io/badge/version-2.4.2-lightgrey.svg)
-![Latest Release](https://img.shields.io/github/v/release/Liqevu324/trae-checkin-android)
+![version 2.4.3](https://img.shields.io/badge/version-2.4.3-lightgrey.svg)
 ![Build](https://github.com/Liqevu324/trae-checkin-android/actions/workflows/build.yml/badge.svg)
 
 > **重要声明（请务必先读）**
@@ -20,35 +19,38 @@
 >    ——包括设置页分组结构、界面配色、`Prefs` 静态方法 + `SharedPreferences` 的持久化写法、
 >    开关状态回读逻辑，以及应用内文档与免责声明的框架。原项目版权行与 MIT 许可证全文已按
 >    许可要求保留在 [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md)。
-> 3. **本项目代码主要由 AI 编写：hy4 与 DeepSeek V4.1 Flash**（Java 源码、XML 布局与资源、
->    构建脚本、文档文案）。人工负责需求、真机验证与发布；关键路径已经真机验证。
+> 3. **本项目几乎所有代码全部由 AI 编写：hy4 与 DeepSeek V4.1 Flash**（全部 Java 源码、
+>    XML 布局与资源、构建脚本、文档文案）。人工负责需求、真机验证与发布；关键路径已经真机验证。
 >    详见 [`AI-USAGE.md`](AI-USAGE.md)。
->
-> 项目状态：本项目最初仅为个人自用，后来整理开源；受官方接口与维护精力所限，后续大概率不会有功能性更新，现有版本按「现状」提供，不承诺固定响应时限或持续可用。
+
+> **项目状态**：本项目最初仅为个人自用，后来整理开源；受官方接口与维护精力所限，后续大概率不会有功能性更新，现有版本按「现状」提供，不承诺固定响应时限或持续可用。
 
 <p align="center">
   <img src="screenshots/main.jpg" width="200" alt="今日签到" />
   <img src="screenshots/credits.jpg" width="200" alt="积分明细" />
+  <img src="screenshots/logs.jpg" width="200" alt="签到日志" />
   <img src="screenshots/settings.jpg" width="200" alt="设置" />
 </p>
 
-<p align="center"><sub>真机截图（1080×2340；账号名称为用户自设别名，积分为截图时余额）</sub></p>
+<p align="center"><sub>真机截图（1080×2340，Android 真机截取；账号昵称与积分为演示数据）</sub></p>
 
 ## 下载安装
 
-**最新版本 v2.4.2，安装即用。**
+**最新版本 v2.4.3，安装即用。**
 
-- [**下载 TraeCheckin-2.4.2.apk**](https://github.com/Liqevu324/trae-checkin-android/releases/latest)
+- [**下载 TraeCheckin-2.4.3.apk**](https://github.com/Liqevu324/trae-checkin-android/releases/latest)
 - 要求 Android 7.0+（minSdk 24）。
-- 可直接覆盖安装 v2.4.1 / 2.4.0 / 2.3.0 / 2.2.0：签名证书一致，账号、签到记录、
+- 可直接覆盖安装 v2.4.2 / 2.4.1 / 2.4.0 / 2.3.0 / 2.2.0：签名证书一致，账号、签到记录、
   手动设置的设备号与设置全部保留。
 - 从源码自行构建的 APK 签名不同，需先卸载旧版（会清空本地数据）。
-- 安装包 SHA256：`48a74c12d81bfa86e6e1f78b429cd256ee5a968ef3e7827f654dac24066e7e5d`
+- 安装包 SHA256：`849abc9e8873006ce008ce70fd42a9c713da69dc108d6dbdac824dde6622323a`
 - 签名证书 SHA256：`6f53acbfb3dc6723db5239232a1b039d003e30387727844956c6061882b824b3`
+- 历史版本 2.2.0–2.4.2 已同步发布在 [Releases](https://github.com/Liqevu324/trae-checkin-android/releases)；
+  版本顺序、SHA256 与安装建议见 [`docs/APK-ARCHIVE.md`](docs/APK-ARCHIVE.md)。
 
 ```bash
-sha256sum TraeCheckin-2.4.2.apk
-apksigner verify --print-certs TraeCheckin-2.4.2.apk
+sha256sum TraeCheckin-2.4.3.apk
+apksigner verify --print-certs TraeCheckin-2.4.3.apk
 ```
 
 更详细的校验值与签名信息见 [`docs/SHA256SUMS.txt`](docs/SHA256SUMS.txt) 与
@@ -62,6 +64,8 @@ apksigner verify --print-certs TraeCheckin-2.4.2.apk
 - **积分明细**：汇总所有账号的剩余积分，逐账号展示，支持手动刷新
 - **签到日志**：按天分组展示签到记录，可一键清空；失败尝试也会记录并展示服务端原因；长按单条日志可复制完整报错与错误码（不含登录凭据）
 - **每日定时签到**：系统闹钟（AlarmManager）到点自动签到，结果以通知汇报，重启后自动恢复
+- **断网自动补签**：签到前预检网络，网络类失败（DNS / 连接 / 超时）按 15 / 30 / 60 分钟自动补签，最多 3 次；
+  业务错误码不重试，已签到的账号不会重复领取
 - **首次打开自动签到**：作为定时任务被系统杀掉时的兜底
 - **每日凭证保活**：每天 03:30 自动换新一次登录凭证，避免到点签到时 token 过期
 - **签到配置**：自定义签到时间、随机延迟（避免固定时间集中请求）、按账号排除自动签到
@@ -73,16 +77,12 @@ apksigner verify --print-certs TraeCheckin-2.4.2.apk
 
 最低支持 Android 7.0（minSdk 24，targetSdk 34）。
 
-<details>
-<summary>签到日志截图（含 9074 排障示例）</summary>
-<p align="center"><img src="screenshots/logs.jpg" width="240" alt="签到日志" /></p>
-</details>
-
 ## 权限说明
 
 | 权限 | 用途 | 拒绝后果 |
 |---|---|---|
 | `INTERNET` | 访问 `api.trae.cn` 与 `www.trae.cn` | 无法登录与签到 |
+| `ACCESS_NETWORK_STATE` | 签到前判断网络是否可用（只读状态，不采集信息） | 无法预检，只能等请求超时 |
 | `POST_NOTIFICATIONS`（Android 13+） | 推送签到结果通知 | 签到照常执行，只是没有通知 |
 | `RECEIVE_BOOT_COMPLETED` | 开机后重新注册定时闹钟 | 重启后需手动打开一次 App |
 | `SCHEDULE_EXACT_ALARM` / `USE_EXACT_ALARM` | 到点精确触发签到 | 退化为系统批量唤醒，可能延迟 |
@@ -94,7 +94,7 @@ apksigner verify --print-certs TraeCheckin-2.4.2.apk
 ## 使用
 
 1. 首次打开 → 点右上角「+」→ 在官方授权页用手机号 + 验证码登录 Trae
-2. 登录成功后上游自动回跳，App 截住回调、换取凭证并**无需手动操作**返回，账号出现在列表中并自动完成当天签到
+2. 登录成功后，在弹出的「登录以使用 TraeWork」页面点击 **「登录并打开 TraeWork」**；上游随后自动回跳，App 截住回调、换取凭证，账号出现在列表中并自动完成当天签到
 3. 之后可随时点「一键签到」；「设置」按分组提供自动任务、签到配置、后台权限、数据、帮助与协议
    - 自动任务：每日自动签到 / 凭证保活 / 首次打开自动签到 / 通知提醒
    - 签到配置：管理签到时间（默认 09:00）、随机延迟、勾选不参与自动签到的账号
@@ -106,6 +106,17 @@ apksigner verify --print-certs TraeCheckin-2.4.2.apk
 6. **若重新登录后仍报 `9074`**：点账号卡片 →「设置设备号」，手动指定一个 12~20 位纯数字的
    设备标识。**只需设置一次**，之后每天签到全程在手机完成，不需要电脑、也不需要服务器。
    请确认你的使用方式符合 Trae 官方服务条款；多个账号请分别使用各自的号码。
+
+## 添加账号流程
+
+1. 打开 App，点右上角「+」。
+2. 在官方授权页按正常流程用手机号 + 验证码登录。登录检测器响应可能稍慢，请耐心等待；如果长时间没有反应，换一个更稳定的网络（例如移动数据）再试。
+3. 登录完成后，页面会弹出「登录以使用 TraeWork」，点击绿色的 **「登录并打开 TraeWork」**。
+4. 上游自动回跳，App 读取凭证并把账号加入列表；首次添加会自动完成当天签到。
+
+> 不要点「使用其他账号登录」或「取消」；如果误点，重新发起登录即可。
+
+<!-- 截图待补：screenshots/add-account.jpg（用户原图未落盘，上传后补入） -->
 
 ## 工作原理
 
@@ -181,31 +192,15 @@ ANDROID_SDK=/opt/android-sdk bash build.sh
 
 ```
 trae-checkin-android/
-├── .github/
-│   ├── CODEOWNERS
-│   ├── ISSUE_TEMPLATE/
-│   │   ├── bug_report.yml
-│   │   └── feature_request.yml
-│   ├── PULL_REQUEST_TEMPLATE.md
-│   └── workflows/build.yml        # CI：构建 + 签名校验
-├── .gitattributes
-├── .gitignore
-├── AI-USAGE.md
-├── ARCHITECTURE.md
-├── CHANGELOG.md
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md
-├── LICENSE
-├── PRIVACY.md
-├── README.md
-├── SECURITY.md
-├── THIRD-PARTY-NOTICES.md
 ├── AndroidManifest.xml
-├── build.sh                       # 无 Gradle 构建脚本
-├── docs/
-│   ├── RELEASE_NOTES_v2.4.2.md
-│   ├── SHA256SUMS.txt
-│   └── SIGNING-CERT.txt
+├── build.sh                       # 一键构建脚本
+├── TraeCheckin.apk                # 本地构建产物，不入库；从 Releases 下载
+├── .github/                       # Issue / PR 模板、CI（build.yml）、CODEOWNERS
+├── docs/                          # Release Notes、APK 校验值、签名证书
+├── screenshots/                   # 真机截图
+├── CODE_OF_CONDUCT.md
+├── LICENSE
+├── README.md
 ├── res/
 │   ├── layout/                    # 原生 XML 布局（主界面 / 登录 / 积分 / 日志 / 设置 / 文档 + 列表项）
 │   ├── drawable/                  # 纯 shape / vector 资源
@@ -214,7 +209,6 @@ trae-checkin-android/
 │   ├── anim/                      # 页面转场动画（淡入 + 轻微位移）
 │   ├── raw/                       # 4 份中文文档（说明书 / 隐私 / 用户协议 / 开源许可）
 │   └── xml/                       # network_security_config（只放行 loopback 回调）
-├── screenshots/                   # 4 张真机截图
 └── src/com/traecheckin/mobile/
     ├── MainActivity.java          # 账号列表 + Hero 卡 + 一键签到
     ├── LoginActivity.java         # SOLO OAuth 授权 + 回调截获 + 凭证落库 + JS 语法降级
@@ -225,24 +219,22 @@ trae-checkin-android/
     ├── NavHelper.java             # 底部 Tab 统一高亮（淡紫胶囊）+ 切换动画
     ├── Anim.java                  # 轻量浮入动画工具
     ├── Notice.java                # 系统通知统一出口
-    ├── AutoScheduler.java         # AlarmManager 定时调度（签到 + 凭证保活）
-    ├── CheckinReceiver.java       # 定时签到执行 + 通知
+    ├── AutoScheduler.java         # AlarmManager 定时调度（签到 + 凭证保活 + 补签）
+    ├── CheckinReceiver.java       # 定时签到执行（goAsync + 补签）+ 通知
     ├── MaintenanceReceiver.java   # 每日 03:30 凭证保活
     ├── BootReceiver.java          # 开机 / 更新后恢复闹钟
-    ├── CheckinEngine.java         # 签到执行引擎（换号重试 / 回查确认）
+    ├── CheckinEngine.java         # 签到执行引擎（换号重试 / 回查确认 / 网络补签）
     ├── CheckinResult.java         # 纯 Java 成功判据（便于真值表测试）
+    ├── NetHelper.java             # 网络预检与网络错误判定
     ├── TraeApi.java               # SOLO 接口封装 + ExchangeToken
     ├── AccountStore.java          # 多账号 / 历史 / 设备号迁移 / 导入导出（SharedPreferences + JSON）
     ├── Prefs.java                 # 设置持久化（含新增开关与排除账号）
     └── App.java                   # 通知渠道
 ```
 
-> `TraeCheckin.apk` 是 `build.sh` 的构建产物，不入库；正式安装包统一从
-> [GitHub Releases](https://github.com/Liqevu324/trae-checkin-android/releases/latest) 下载。
-
 ## 已知限制
 
-- **定时任务可能被 ROM 中断**：`CheckinReceiver` 采用「BroadcastReceiver + 裸线程 + WakeLock」执行签到，
+- **定时任务可能被 ROM 中断**：`CheckinReceiver` 采用「BroadcastReceiver + goAsync() + 后台线程 + WakeLock」执行签到，
   未走 JobScheduler/WorkManager（无第三方依赖的约束下成本较高）。国产 ROM 需手动允许「自启动 / 后台运行 /
   关闭电池优化」，否则到点签到可能被系统杀掉；App 会把设置页的权限引导作为兜底。
 - **底部 Tab 切换是 Activity 级跳转**：四个 Tab 各自是独立 Activity，切换用 `startActivity + finish()`
@@ -271,8 +263,6 @@ trae-checkin-android/
 - **第三方登录走 `window.open`**：抖音 / 苹果 / 企业账号登录会弹出授权页，App 用
   1×1 的隐藏 WebView 承接弹窗、并把首跳 URL 立刻转交主 WebView 展示；若某些机型上仍无法完成，
   建议使用手机号 + 验证码登录。
-- **安全边界**：OAuth 回调校验、WebView Host 白名单、剪贴板导出、后台线程等已知限制见
-  [SECURITY.md](SECURITY.md)。
 
 ## 版本线
 
@@ -288,13 +278,27 @@ trae-checkin-android/
 | 2.4.0 | 8 | 界面与设置大升级：5 组分组式设置、每日 03:30 凭证保活、积分到期提醒、排除账号、账号 JSON 导入导出、4 份内置中文文档、关于区、全局转场动画、配色对齐参考项目 |
 | 2.4.1 | 9 | 开发者改为双署名；移除积分到期提醒（积分 30 天才过期，提醒意义不大）；补齐开源声明材料 |
 | 2.4.2 | 10 | 开源前合规与文档修订：移除文档中的 `storage.json` 提取教程、移除与 MIT 冲突的「禁止商用」、补齐参考项目许可证列、语气中性化、换真机截图、整理为完整开源仓库；零业务逻辑改动，签名未轮换 |
+| 2.4.3 | 11 | 修「断网漏签」：`NetHelper` 网络预检、网络错误 3 次退避重试、失败后 15 / 30 / 60 分钟自动补签（最多 3 次）、多账号断网统一交给补签、`CheckinReceiver` 改 `goAsync()` + 20 分钟 WakeLock、修复 `thread interrupted`、日志区分网络 / 业务错误；新增 `ACCESS_NETWORK_STATE` |
 
 > 1.0.0 / 2.0.0 据早期构建记录补充，未写入正式 `CHANGELOG.md`；2.1.0 起来自 `CHANGELOG.md`。
-> 2.2.0 到 2.4.2 使用同一把签名私钥，可直接覆盖安装；1.0.0 / 2.0.0 / 2.1.x 的 APK 未保留。
+> 2.2.0 到 2.4.3 使用同一把签名私钥，可直接覆盖安装；1.0.0 / 2.0.0 / 2.1.x 的 APK 未保留。
 
-主线：1.0 验证想法（WebView / HTML）→ 2.0 重写原生 → 2.1.x 修登录、假成功与日志 → 2.2.0 换官方 SOLO OAuth → 2.3.0 攻克 9074 → 2.4.0 做好界面与设置 → 2.4.1 / 2.4.2 精简与开源收尾。
+主线：1.0 验证想法（WebView / HTML）→ 2.0 重写原生 → 2.1.x 修登录、假成功与日志 → 2.2.0 换官方 SOLO OAuth → 2.3.0 攻克 9074 → 2.4.0 做好界面与设置 → 2.4.1 / 2.4.2 精简与开源收尾 → 2.4.3 补网络容错与自动补签。
+
+### v2.4.3 更新详情
+
+- **断网预检**：`NetHelper` 在签到前检查网络，断网最多等 15 秒；预检只决定「要不要等」，成败仍以服务器返回为准。
+- **有限重试**：`status` / `claim` 遇 DNS、连接失败、超时最多 3 次（退避 3s / 8s）；9074 / 9095 / 1001 等业务错误不重试。
+- **失败自动补签**：定时签到网络失败后，按 15 → 30 → 60 分钟补签，最多 3 次，覆盖约 1 小时 45 分；独立 action / 请求码 1003，不覆盖次日闹钟；补签前先查 `status`，已签到不重复领取。
+- **多账号**：首个账号判定断网后，其余账号不再逐个空等，统一交给补签处理。
+- **后台稳定**：`CheckinReceiver` 改 `goAsync()` + 20 分钟 `PARTIAL_WAKE_LOCK`；退出页面不再 `shutdownNow()` 中断联网线程。
+- **错误归类**：网络错误日志带 `net` 标记；`claim` 成功但回查断网记「待回查」；通知区分「网络异常，签到待补」「第 n/3 次补签」「已达补签上限」。
+- **权限**：新增 `ACCESS_NETWORK_STATE`，只读取网络状态，不采集信息。
 
 ## FAQ
+
+**Q：2.4.3 和 2.4.2 有什么区别？**
+A：只修网络容错与自动补签；登录、签到、设备号校验、积分明细、日志、设置与界面全部不变，签名一致，可直接覆盖安装。
 
 **Q：支持哪些登录方式？**
 A：取决于 Trae 官方授权页；建议使用手机号 + 验证码登录。
@@ -329,14 +333,12 @@ A：项目不使用 androidx / Material / 任何第三方库，纯 Android SDK �
 本项目不承诺持续可用或及时更新；积分政策（每日奖励额度等）以 Trae 官方为准。
 如平台提出要求，本项目可随时停止分发。
 
-本项目代码主要由 AI 生成，虽经真机验证，但不排除仍有错误；建议在使用前自行审阅源码。
-
 > 说明：本项目采用 MIT 许可证，**MIT 允许商业使用**，因此此处不写「禁止商用」；
 > 下面约束的是「未经授权的收费售卖 / 官方背书」，不是许可证限制。
 
 ## 分发说明
 
-本应用仅通过 GitHub Releases 分发，**本人未授权任何个人或机构收费售卖**；从第三方付费购得的
+本应用通过 GitHub Releases 等免费渠道分发，**本人未授权任何个人或机构收费售卖**；从第三方付费购得的
 版本均非开发者提供，其安全性无法保证，请只从官方 Release 渠道获取更新。
 本应用未上架任何应用商店，不含广告、统计与推送 SDK。
 
@@ -348,7 +350,7 @@ A：项目不使用 androidx / Material / 任何第三方库，纯 Android SDK �
   应用内文档章节框架、免责声明与分发说明的措辞骨架。业务层 Java 类因技术栈不同
   （本项目零 Gradle / 零 AndroidX）由 AI 对照参考重新实现。
   版权行与 MIT 全文见 [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md)。
-- **AI 编写**：本项目代码主要由 **hy4** 与 **DeepSeek V4.1 Flash** 编写，
+- **AI 编写**：本项目几乎所有代码全部由 **hy4** 与 **DeepSeek V4.1 Flash** 编写，
   详见 [`AI-USAGE.md`](AI-USAGE.md)。
 - **引用链**：原版项目 → `changexbc/workbuddy-switch`（MIT，Copyright (c) 2026 wb-switch），
   本项目为间接参考；另参考了 `Maquer/trae-signin`、`xiaoyinge/trae-signin-gui`、
@@ -368,5 +370,5 @@ A：项目不使用 androidx / Material / 任何第三方库，纯 Android SDK �
 
 完整文档索引：[原理与架构](ARCHITECTURE.md) · [隐私说明](PRIVACY.md) ·
 [第三方声明](THIRD-PARTY-NOTICES.md) · [AI 使用声明](AI-USAGE.md) ·
-[安全政策](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [行为准则](CODE_OF_CONDUCT.md) ·
-[更新日志](CHANGELOG.md) · [Release Notes](docs/RELEASE_NOTES_v2.4.2.md)
+[安全政策](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [更新日志](CHANGELOG.md) ·
+[Release Notes](docs/RELEASE_NOTES_v2.4.3.md) · [行为准则](CODE_OF_CONDUCT.md) · [APK 归档与校验](docs/APK-ARCHIVE.md)

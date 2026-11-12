@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MainActivity extends Activity {
 
     /** 版本号（设置页「关于」也会用到）。 */
-    public static final String VERSION = "2.4.2";
+    public static final String VERSION = "2.4.3";
 
     private static final int REQ_LOGIN = 2001;
 
@@ -117,7 +117,9 @@ public class MainActivity extends Activity {
         destroyed = true;
         if (executor != null) {
             try {
-                executor.shutdownNow();
+                // 页面销毁不等于用户要取消签到。旧版 shutdownNow() 会中断正在联网的线程，
+                // 产生 thread interrupted 并丢掉首开自动签到；改为停止接收新任务、允许当前任务完成。
+                executor.shutdown();
             } catch (Throwable ignored) {
             }
             executor = null;
@@ -416,6 +418,7 @@ public class MainActivity extends Activity {
         setCheckinBusy(true, firstOpen);
         final AtomicInteger ok = new AtomicInteger(0);
         final AtomicInteger fail = new AtomicInteger(0);
+        final AtomicInteger networkFail = new AtomicInteger(0);
         final AtomicInteger left = new AtomicInteger(accounts.size());
 
         for (final AccountStore.Account a : accounts) {
@@ -436,6 +439,7 @@ public class MainActivity extends Activity {
                         ok.incrementAndGet();
                     } else {
                         fail.incrementAndGet();
+                        if (NetHelper.isNetworkError(r)) networkFail.incrementAndGet();
                     }
                     AccountStore.Account fresh = store.byId(a.id);
                     final AccountStore.Account shown = fresh == null ? a : fresh;
@@ -453,7 +457,7 @@ public class MainActivity extends Activity {
                             @Override
                             public void run() {
                                 if (destroyed) return;
-                                finishCheckinAll(ok.get(), fail.get(), firstOpen);
+                                finishCheckinAll(ok.get(), fail.get(), networkFail.get(), firstOpen);
                             }
                         });
                     }
@@ -496,16 +500,27 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void finishCheckinAll(int ok, int fail, boolean firstOpen) {
+    private void finishCheckinAll(int ok, int fail, int networkFail, boolean firstOpen) {
         setCheckinBusy(false, firstOpen);
         loadAccounts();
+        boolean retryScheduled = false;
+        if (networkFail > 0 && (firstOpen || Prefs.autoEnabled(this))) {
+            retryScheduled = AutoScheduler.scheduleNetworkRetry(this, 1);
+        } else if (fail == 0) {
+            AutoScheduler.cancelNetworkRetry(this);
+        }
         if (firstOpen) {
-            if (ok > 0) {
+            // 有账号因网络失败时不要把「今天首开签到」标记为已完成；独立补签也会继续兜底。
+            if (ok > 0 && networkFail == 0) {
                 Prefs.setLastOpenCheckinDate(this, AccountStore.today());
             }
             return;
         }
-        toast(getString(R.string.checkin_summary_fmt, ok, fail));
+        String summary = getString(R.string.checkin_summary_fmt, ok, fail);
+        if (retryScheduled) {
+            summary += "；" + AutoScheduler.networkRetryDelayLabel(1) + "后自动补签";
+        }
+        toast(summary);
     }
 
     private void setCheckinBusy(boolean busy, boolean firstOpen) {
