@@ -34,6 +34,33 @@
 
 <p align="center"><sub>真机截图（1080×2340，Android 真机截取；账号昵称与积分为演示数据）</sub></p>
 
+<p align="center"><a href="README.md">简体中文</a> · <a href="README.en.md">English</a></p>
+
+<details>
+<summary>目录</summary>
+
+- [下载安装](#下载安装)
+- [功能](#功能)
+- [权限说明](#权限说明)
+- [使用](#使用)
+- [添加账号流程](#添加账号流程)
+- [工作原理](#工作原理)
+- [从源码构建](#从源码构建)
+- [项目结构](#项目结构)
+- [已知限制](#已知限制)
+- [版本线](#版本线)
+- [FAQ](#faq)
+- [用户文档](#用户文档)
+- [相关项目](#相关项目)
+- [免责声明](#免责声明)
+- [分发说明](#分发说明)
+- [关于代码来源与 AI 编写](#关于代码来源与-ai-编写)
+- [致谢](#致谢)
+- [License](#license)
+- [English README](README.en.md)
+
+</details>
+
 ## 下载安装
 
 **最新版本 v2.4.3，安装即用。**
@@ -93,30 +120,33 @@ apksigner verify --print-certs TraeCheckin-2.4.3.apk
 
 ## 使用
 
-1. 首次打开 → 点右上角「+」→ 在官方授权页用手机号 + 验证码登录 Trae
-2. 登录成功后，在弹出的「登录以使用 TraeWork」页面点击 **「登录并打开 TraeWork」**；上游随后自动回跳，App 截住回调、换取凭证，账号出现在列表中并自动完成当天签到
-3. 之后可随时点「一键签到」；「设置」按分组提供自动任务、签到配置、后台权限、数据、帮助与协议
+1. **首次添加账号**：点右上角「+」，按 [添加账号流程](#添加账号流程) 操作。
+2. 之后可随时点「一键签到」；「设置」按分组提供自动任务、签到配置、后台权限、数据、帮助与协议
    - 自动任务：每日自动签到 / 凭证保活 / 首次打开自动签到 / 通知提醒
    - 签到配置：管理签到时间（默认 09:00）、随机延迟、勾选不参与自动签到的账号
    - 数据：导入 / 导出账号（JSON）、清除日志
    - 帮助与协议：四份内置文档，以及开发者、版本与免责声明
-4. token 过期时 App 会自动用保存的 `refreshToken` 续期；若提示「需重新登录」，点开账号菜单选「重新登录」再授权一次即可
-5. **从 2.2.0 及更早版本升级的用户：请把每个账号都重新登录一次。** 旧版本授权链接的
+3. token 过期时 App 会自动用保存的 `refreshToken` 续期；若提示「需重新登录」，点开账号菜单选「重新登录」再授权一次即可
+4. **从 2.2.0 及更早版本升级的用户：请把每个账号都重新登录一次。** 旧版本授权链接的
    `machine_id` / 请求头指纹与官方契约不一致，会让上游设备校验持续返回 `9074`
-6. **若重新登录后仍报 `9074`**：点账号卡片 →「设置设备号」，手动指定一个 12~20 位纯数字的
+5. **若重新登录后仍报 `9074`**：点账号卡片 →「设置设备号」，手动指定一个 12~20 位纯数字的
    设备标识。**只需设置一次**，之后每天签到全程在手机完成，不需要电脑、也不需要服务器。
    请确认你的使用方式符合 Trae 官方服务条款；多个账号请分别使用各自的号码。
+   更多排障见 [排障手册](docs/TROUBLESHOOTING.md#9074)。
 
 ## 添加账号流程
 
-1. 打开 App，点右上角「+」。
+1. 打开 App，在「今日签到」页点右上角「+」（见下方步骤 1 截图）。
 2. 在官方授权页按正常流程用手机号 + 验证码登录。登录检测器响应可能稍慢，请耐心等待；如果长时间没有反应，换一个更稳定的网络（例如移动数据）再试。
-3. 登录完成后，页面会弹出「登录以使用 TraeWork」，点击绿色的 **「登录并打开 TraeWork」**。
+3. 登录完成后，页面会弹出「登录以使用 TraeWork」，点击绿色的 **「登录并打开 TraeWork」**（见下方步骤 3 截图）。
 4. 上游自动回跳，App 读取凭证并把账号加入列表；首次添加会自动完成当天签到。
 
 > 不要点「使用其他账号登录」或「取消」；如果误点，重新发起登录即可。
 
-<!-- 截图待补：screenshots/add-account.jpg（用户原图未落盘，上传后补入） -->
+| 步骤 1：点右上角「+」 | 步骤 3：点「登录并打开 TraeWork」 |
+|---|---|
+| <img src="screenshots/add-account-entry.jpg" width="240" alt="今日签到页右上角加号" /> | <img src="screenshots/add-account-traework.jpg" width="240" alt="登录并打开 TraeWork" /> |
+| <sub>从「今日签到」页右上角开始添加。</sub> | <sub>登录完成后点绿色按钮，不要点「取消」。</sub> |
 
 ## 工作原理
 
@@ -264,6 +294,9 @@ trae-checkin-android/
   1×1 的隐藏 WebView 承接弹窗、并把首跳 URL 立刻转交主 WebView 展示；若某些机型上仍无法完成，
   建议使用手机号 + 验证码登录。
 
+> 遇到 9074 / 9095 / 1001 / 断网 / 通知 / 定时不执行，先看 [排障手册](docs/TROUBLESHOOTING.md)；
+> 不同 ROM 的后台设置见 [兼容性说明](docs/COMPATIBILITY.md)。
+
 ## 版本线
 
 | 版本 | versionCode | 核心变化 |
@@ -310,13 +343,32 @@ A：检查系统是否允许自启动、后台运行与电池优化白名单；�
 A：应用会自动用 `refreshToken` 续期；续期失败时账号会标记「需重新登录」，重新授权一次即可。
 
 **Q：卸载会丢失什么？**
-A：账号、签到日志与设置都保存在应用私有目录，卸载即全部清除。换机或卸载前请先导出账号。
+A：账号、签到日志与设置都保存在应用私有目录，卸载即全部清除。换机或卸载前请先导出账号，步骤见 [迁移与备份](docs/MIGRATION.md)。
 
 **Q：支持多账号吗？**
 A：支持个人多账号管理；不支持代签、批量注册、多租户或任何违反平台规则的用法。
 
 **Q：为什么安装包只有约 200 KB？**
 A：项目不使用 androidx / Material / 任何第三方库，纯 Android SDK 实现，所以 APK 很小。
+
+## 用户文档
+
+- [排障手册](docs/TROUBLESHOOTING.md)：9074 / 9095 / 1001 / 9004、登录弹窗、WebView、断网补签、通知、定时任务。
+- [迁移与备份](docs/MIGRATION.md)：导出 / 导入账号、换机、卸载前备份、设备号保留。
+- [兼容性说明](docs/COMPATIBILITY.md)：Android 版本、国产 ROM 后台设置、WebView 要求。
+- [APK 归档与校验](docs/APK-ARCHIVE.md)：2.2.0 → 2.4.3 的 SHA256、签名、安装顺序。
+- [English README](README.en.md)：English overview and download.
+
+## 相关项目
+
+| 项目 | 形态 | 与本项目的差异 |
+|---|---|---|
+| [Luckyboy-daidai/wb-checkin-android](https://github.com/Luckyboy-daidai/wb-checkin-android) | Android / WorkBuddy | 本项目的参考项目；本项目在 SOLO OAuth、设备号与 9074、自动补签上做了独立实现 |
+| [ggzhzc/workbuddy-trae-checkin](https://github.com/ggzhzc/workbuddy-trae-checkin) | Cloudflare Worker | 云端托管，不需要安装 App；适合有 Cloudflare 账号的用户 |
+| [Maquer/trae-signin](https://github.com/Maquer/trae-signin) | GitHub Actions / CLI | 纯签到脚本 + 定时工作流；适合桌面或服务器 |
+| [xiaoyinge/trae-signin-gui](https://github.com/xiaoyinge/trae-signin-gui) | Windows 桌面 | Tauri 2 + Rust 单 exe；适合 Windows 用户 |
+
+> 以上仅为同类项目索引，不是背书；请自行评估各项目的许可证、安全性与合规风险。
 
 ## 免责声明
 
@@ -371,4 +423,6 @@ A：项目不使用 androidx / Material / 任何第三方库，纯 Android SDK �
 完整文档索引：[原理与架构](ARCHITECTURE.md) · [隐私说明](PRIVACY.md) ·
 [第三方声明](THIRD-PARTY-NOTICES.md) · [AI 使用声明](AI-USAGE.md) ·
 [安全政策](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [更新日志](CHANGELOG.md) ·
-[Release Notes](docs/RELEASE_NOTES_v2.4.3.md) · [行为准则](CODE_OF_CONDUCT.md) · [APK 归档与校验](docs/APK-ARCHIVE.md)
+[排障手册](docs/TROUBLESHOOTING.md) · [迁移与备份](docs/MIGRATION.md) ·
+[兼容性说明](docs/COMPATIBILITY.md) · [Release Notes](docs/RELEASE_NOTES_v2.4.3.md) ·
+[行为准则](CODE_OF_CONDUCT.md) · [APK 归档与校验](docs/APK-ARCHIVE.md) · [English](README.en.md)
