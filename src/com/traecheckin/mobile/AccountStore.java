@@ -540,6 +540,12 @@ public class AccountStore {
             JSONObject o = arr.optJSONObject(i);
             if (o != null && o.optString("id").equals(acc.id)) {
                 try {
+                    // 写库前强制不变量：设备号一旦变化，旧号上的“已验证”必须清零。
+                    // 这样即使未来某个调用方忘了重置，也不会把新号误标成已验证。
+                    String oldDeviceId = o.optString("device_id");
+                    if (!oldDeviceId.equals(acc.deviceId)) {
+                        acc.deviceIdVerified = false;
+                    }
                     arr.put(i, acc.toJson());
                     data.put("accounts", arr);
                     persist();
