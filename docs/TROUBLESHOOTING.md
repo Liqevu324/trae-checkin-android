@@ -96,6 +96,6 @@
 
 ## 日志与反馈
 
-- 长按单条日志可复制完整报错：`app_version / account / time / result / code / remaining / device_id / device_src / req_source`，**不含** token、refreshToken、cookie 或完整响应体。
+- 长按单条日志可复制完整报错：`app_version / account / time / result / code / remaining / device_id / device_src / device_verified / req_source`，**不含** token、refreshToken、cookie 或完整响应体。
 - 反馈时请附：版本号、Android 版本、ROM、错误码、日志文本。
 - **不要**发送账号密码、完整 token、`refreshToken` 或导出的账号 JSON。

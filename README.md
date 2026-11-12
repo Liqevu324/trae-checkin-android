@@ -7,7 +7,7 @@
 ![minSdk 24](https://img.shields.io/badge/minSdk-24-green.svg)
 ![Java 8](https://img.shields.io/badge/Java-8-orange.svg)
 ![零第三方依赖](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
-![version 2.4.3](https://img.shields.io/badge/version-2.4.3-lightgrey.svg)
+![version 2.4.4](https://img.shields.io/badge/version-2.4.4-lightgrey.svg)
 ![Build](https://github.com/Liqevu324/trae-checkin-android/actions/workflows/build.yml/badge.svg)
 
 > **重要声明（请务必先读）**
@@ -63,21 +63,21 @@
 
 ## 下载安装
 
-**最新版本 v2.4.3，安装即用。**
+**最新版本 v2.4.4，安装即用。**
 
-- [**下载 TraeCheckin-2.4.3.apk**](https://github.com/Liqevu324/trae-checkin-android/releases/latest)
+- [**下载 TraeCheckin-2.4.4.apk**](https://github.com/Liqevu324/trae-checkin-android/releases/latest)
 - 要求 Android 7.0+（minSdk 24）。
-- 可直接覆盖安装 v2.4.2 / 2.4.1 / 2.4.0 / 2.3.0 / 2.2.0：签名证书一致，账号、签到记录、
+- 可直接覆盖安装 v2.4.3 / 2.4.2 / 2.4.1 / 2.4.0 / 2.3.0 / 2.2.0：签名证书一致，账号、签到记录、
   手动设置的设备号与设置全部保留。
 - 从源码自行构建的 APK 签名不同，需先卸载旧版（会清空本地数据）。
-- 安装包 SHA256：`849abc9e8873006ce008ce70fd42a9c713da69dc108d6dbdac824dde6622323a`
+- 安装包 SHA256：`747e1e656fd88d903e236a53e76813b101962e74d7972bfe01d84bb1914f1d61`
 - 签名证书 SHA256：`6f53acbfb3dc6723db5239232a1b039d003e30387727844956c6061882b824b3`
-- 历史版本 2.2.0–2.4.2 已同步发布在 [Releases](https://github.com/Liqevu324/trae-checkin-android/releases)；
+- 历史版本 2.2.0–2.4.3 已同步发布在 [Releases](https://github.com/Liqevu324/trae-checkin-android/releases)；
   版本顺序、SHA256 与安装建议见 [`docs/APK-ARCHIVE.md`](docs/APK-ARCHIVE.md)。
 
 ```bash
-sha256sum TraeCheckin-2.4.3.apk
-apksigner verify --print-certs TraeCheckin-2.4.3.apk
+sha256sum TraeCheckin-2.4.4.apk
+apksigner verify --print-certs TraeCheckin-2.4.4.apk
 ```
 
 更详细的校验值与签名信息见 [`docs/SHA256SUMS.txt`](docs/SHA256SUMS.txt) 与
@@ -128,7 +128,8 @@ apksigner verify --print-certs TraeCheckin-2.4.3.apk
    - 帮助与协议：四份内置文档，以及开发者、版本与免责声明
 3. token 过期时 App 会自动用保存的 `refreshToken` 续期；若提示「需重新登录」，点开账号菜单选「重新登录」再授权一次即可
 4. **从 2.2.0 及更早版本升级的用户：请把每个账号都重新登录一次。** 旧版本授权链接的
-   `machine_id` / 请求头指纹与官方契约不一致，会让上游设备校验持续返回 `9074`
+   `machine_id` / 请求头指纹与官方契约不一致，会让上游设备校验持续返回 `9074`。
+   2.4.4 起重新登录会自动沿用旧设备号，不会再换号。
 5. **若重新登录后仍报 `9074`**：点账号卡片 →「设置设备号」，手动指定一个 12~20 位纯数字的
    设备标识。**只需设置一次**，之后每天签到全程在手机完成，不需要电脑、也不需要服务器。
    请确认你的使用方式符合 Trae 官方服务条款；多个账号请分别使用各自的号码。
@@ -275,10 +276,11 @@ trae-checkin-android/
   并随授权页注册给上游。但上游还会校验该号是否「客户端真实注册、已被账号绑定」，
   手机端自动生成的号**可能不被认可** —— 这是上游风控，不是登录或网络问题。
   此时点账号卡片 →「设置设备号」手动指定设备标识即可
-  （一次性操作，见「使用」第 6 条）。手动号会被标记为「手动设置」，9074 时**不会自动轮换**。
+  （一次性操作，见「使用」第 5 条）。手动号会被标记为「手动设置」；成功领取过的号会被标记为已验证；
+  两类号在 9074 时都**不会自动轮换**。
   一个设备号一天只能签一个账号，第二个账号用同号会返回 `9095`（保存时会检测撞号）。
 - **`9004`（设备未注册）/ `9074`（设备校验未通过）**：账号仍会保存并显示具体原因，
-  日志长按可复制完整报错，含 `device_id` / `device_src` / `req_source`，便于定位；
+  日志长按可复制完整报错，含 `device_id` / `device_src` / `device_verified` / `req_source`，便于定位；
   日志**不含 token、refreshToken、cookie 或完整响应体**。
 - **refreshToken 也可能失效**：用户在 Trae 侧退出登录、修改密码或长期不使用时，
   `ExchangeToken` 会被拒，此时账号标记「需重新登录」，重新授权一次即可。
@@ -313,11 +315,12 @@ trae-checkin-android/
 | 2.4.1 | 9 | 开发者改为双署名；移除积分到期提醒（积分 30 天才过期，提醒意义不大）；补齐开源声明材料 |
 | 2.4.2 | 10 | 开源前合规与文档修订：移除文档中的 `storage.json` 提取教程、移除与 MIT 冲突的「禁止商用」、补齐参考项目许可证列、语气中性化、换真机截图、整理为完整开源仓库；零业务逻辑改动，签名未轮换 |
 | 2.4.3 | 11 | 修「断网漏签」：`NetHelper` 网络预检、网络错误 3 次退避重试、失败后 15 / 30 / 60 分钟自动补签（最多 3 次）、多账号断网统一交给补签、`CheckinReceiver` 改 `goAsync()` + 20 分钟 WakeLock、修复 `thread interrupted`、日志区分网络 / 业务错误；新增 `ACCESS_NETWORK_STATE` |
+| 2.4.4 | 12 | 修「重新登录后 9074」：重新登录原样沿用旧 `device_id` / `machine_id`（手动、自动都沿用），只有新账号才生成新号；新增 `device_id_verified`，成功领取后锁定设备号；已验证号 / 手动号遇 9074 不再自动换号；设备号变化强制清零；新增/导入避免非法号和撞号；日志新增 `device_verified` |
 
 > 1.0.0 / 2.0.0 据早期构建记录补充，未写入正式 `CHANGELOG.md`；2.1.0 起来自 `CHANGELOG.md`。
-> 2.2.0 到 2.4.3 使用同一把签名私钥，可直接覆盖安装；1.0.0 / 2.0.0 / 2.1.x 的 APK 未保留。
+> 2.2.0 到 2.4.4 使用同一把签名私钥，可直接覆盖安装；1.0.0 / 2.0.0 / 2.1.x 的 APK 未保留。
 
-主线：1.0 验证想法（WebView / HTML）→ 2.0 重写原生 → 2.1.x 修登录、假成功与日志 → 2.2.0 换官方 SOLO OAuth → 2.3.0 攻克 9074 → 2.4.0 做好界面与设置 → 2.4.1 / 2.4.2 精简与开源收尾 → 2.4.3 补网络容错与自动补签。
+主线：1.0 验证想法（WebView / HTML）→ 2.0 重写原生 → 2.1.x 修登录、假成功与日志 → 2.2.0 换官方 SOLO OAuth → 2.3.0 攻克 9074 → 2.4.0 做好界面与设置 → 2.4.1 / 2.4.2 精简与开源收尾 → 2.4.3 补网络容错与自动补签 → 2.4.4 修设备号绑定，重新登录不再换号。
 
 ### v2.4.3 更新详情
 
@@ -329,7 +332,20 @@ trae-checkin-android/
 - **错误归类**：网络错误日志带 `net` 标记；`claim` 成功但回查断网记「待回查」；通知区分「网络异常，签到待补」「第 n/3 次补签」「已达补签上限」。
 - **权限**：新增 `ACCESS_NETWORK_STATE`，只读取网络状态，不采集信息。
 
+### v2.4.4 更新详情
+
+- **问题根因**：2.4.3 及更早版本重新登录时会重新生成自动设备号，把账号原来绑定的可用号换掉；新号不被上游认可，`claim` 返回 `9074`。没重新登录的旧账号不受影响。
+- **重新登录沿用旧号**：重新登录时原样使用账号已有的 `device_id` 与 `machine_id`，不再重新随机；只有新账号才生成新号。
+- **设备号锁定**：新增 `device_id_verified`；第一次成功领取后把当前号标记为已验证，之后遇到 `9074` 绝不自动换号，改为提示用户设置设备号。
+- **首次安装**：第一次登录生成唯一 12~20 位数字设备号；第一次成功领取后锁定。之后重新登录、定时签到、补签都继续用这个号。
+- **旧账号兼容**：旧版 JSON 没有 `device_id_verified` 时，合法设备号视为已验证，避免升级后第一次 `9074` 就把可用号换掉。
+- **写库不变量**：`AccountStore.update` 在设备号变化时强制清零 `device_id_verified`；新增/导入账号只接受合法且不撞号的设备号，避免 `9095`。
+- **日志**：新增 `device_verified` 字段，方便判断当前号是否已经成功领取过。
+
 ## FAQ
+
+**Q：重新登录后提示 9074 怎么办？**
+A：先升级到 2.4.4。2.4.4 起重新登录会自动沿用旧设备号，不会换号。如果已经从 2.4.3 中招：在账号菜单「设置设备号」填入重新登录前的旧设备号，保存为手动号，再重新登录一次。
 
 **Q：2.4.3 和 2.4.2 有什么区别？**
 A：只修网络容错与自动补签；登录、签到、设备号校验、积分明细、日志、设置与界面全部不变，签名一致，可直接覆盖安装。
@@ -427,5 +443,5 @@ A：项目不使用 androidx / Material / 任何第三方库，纯 Android SDK �
 [第三方声明](THIRD-PARTY-NOTICES.md) · [AI 使用声明](AI-USAGE.md) ·
 [安全政策](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [更新日志](CHANGELOG.md) ·
 [排障手册](docs/TROUBLESHOOTING.md) · [迁移与备份](docs/MIGRATION.md) ·
-[兼容性说明](docs/COMPATIBILITY.md) · [Release Notes](docs/RELEASE_NOTES_v2.4.3.md) ·
+[兼容性说明](docs/COMPATIBILITY.md) · [Release Notes](docs/RELEASE_NOTES_v2.4.4.md) ·
 [行为准则](CODE_OF_CONDUCT.md) · [APK 归档与校验](docs/APK-ARCHIVE.md) · [English](README.en.md)

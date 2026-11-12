@@ -9,7 +9,7 @@
 ![minSdk 24](https://img.shields.io/badge/minSdk-24-green.svg)
 ![Java 8](https://img.shields.io/badge/Java-8-orange.svg)
 ![no dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
-![version 2.4.3](https://img.shields.io/badge/version-2.4.3-lightgrey.svg)
+![version 2.4.4](https://img.shields.io/badge/version-2.4.4-lightgrey.svg)
 ![Build](https://github.com/Liqevu324/trae-checkin-android/actions/workflows/build.yml/badge.svg)
 
 > **Disclaimer**
@@ -32,14 +32,14 @@
 
 ## Download
 
-**Latest: v2.4.3, ready to install.**
+**Latest: v2.4.4, ready to install.**
 
-- [**Download TraeCheckin-2.4.3.apk**](https://github.com/Liqevu324/trae-checkin-android/releases/latest)
+- [**Download TraeCheckin-2.4.4.apk**](https://github.com/Liqevu324/trae-checkin-android/releases/latest)
 - Android 7.0+ (minSdk 24).
-- Direct upgrade from v2.2.0 / 2.3.0 / 2.4.0 / 2.4.1 / 2.4.2: the six APKs share the same signing key.
+- Direct upgrade from v2.2.0 / 2.3.0 / 2.4.0 / 2.4.1 / 2.4.2 / 2.4.3: the seven APKs share the same signing key.
   Accounts, check-in history, manually set device IDs and settings are preserved.
 - APKs built from source use a different signature; uninstall the old app first (this clears local data).
-- SHA256: `849abc9e8873006ce008ce70fd42a9c713da69dc108d6dbdac824dde6622323a`
+- SHA256: `747e1e656fd88d903e236a53e76813b101962e74d7972bfe01d84bb1914f1d61`
 - Signing certificate SHA256: `6f53acbfb3dc6723db5239232a1b039d003e30387727844956c6061882b824b3`
 - All versions: [Releases](https://github.com/Liqevu324/trae-checkin-android/releases);
   checksums and install order: [`docs/APK-ARCHIVE.md`](docs/APK-ARCHIVE.md).
@@ -53,6 +53,7 @@
 - **Logs**: grouped by day; failed attempts are recorded with server reasons; long-press to copy the full error (no credentials)
 - **Scheduled check-in**: `AlarmManager` + notification, restored after reboot
 - **Network resilience (v2.4.3)**: network preflight, retries for DNS/connect/timeout, automatic re-check-in at 15 / 30 / 60 minutes (up to 3 times), `goAsync()` + 20-minute wake lock, fixed `thread interrupted`
+- **Stable device ID (v2.4.4)**: re-login reuses the existing device ID and machine ID; the first successful claim pins the device ID; verified IDs are never auto-rotated on 9074
 - **Credential keep-alive**: refreshes the login credential daily at 03:30
 - **Check-in settings**: custom time, random delay, exclude accounts from automatic check-in
 - **Import / export**: JSON account migration, append-only and deduplicated; credential warning before export
@@ -76,6 +77,8 @@
 | <sub>Start from the “Today” page.</sub> | <sub>Tap the green button; do not tap “取消”.</sub> |
 
 If you still get `9074`, open the account menu → “设置设备号” and set a 12–20 digit numeric device ID.
+If `9074` appeared only after re-login on v2.4.3, upgrade to v2.4.4: it reuses the existing device ID.
+If already affected, set the pre-re-login device ID as a manual device ID, then re-login once.
 See the [troubleshooting guide](docs/TROUBLESHOOTING.md) (Chinese) for details.
 
 ## Permissions
@@ -113,10 +116,10 @@ The detailed documentation is currently in Chinese:
 - [Troubleshooting](docs/TROUBLESHOOTING.md): 9074 / 9095 / 1001 / 9004, login, WebView, network, notifications, scheduling
 - [Migration & backup](docs/MIGRATION.md): export/import, changing phones, device ID, uninstall warnings
 - [Compatibility](docs/COMPATIBILITY.md): Android versions, Chinese ROM background settings, WebView
-- [APK archive & checksums](docs/APK-ARCHIVE.md): v2.2.0 → v2.4.3 SHA256, signature, install order
+- [APK archive & checksums](docs/APK-ARCHIVE.md): v2.2.0 → v2.4.4 SHA256, signature, install order
 - [Architecture](ARCHITECTURE.md), [privacy](PRIVACY.md), [security](SECURITY.md),
   [third-party notices](THIRD-PARTY-NOTICES.md), [changelog](CHANGELOG.md),
-  [v2.4.3 release notes](docs/RELEASE_NOTES_v2.4.3.md)
+  [v2.4.4 release notes](docs/RELEASE_NOTES_v2.4.4.md)
 
 ## Related projects
 
