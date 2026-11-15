@@ -14,7 +14,7 @@
 | 2.4.2 | 10 | 194 KB | `48a74c12d81bfa86e6e1f78b429cd256ee5a968ef3e7827f654dac24066e7e5d` | [v2.4.2](https://github.com/Liqevu324/trae-checkin-android/releases/tag/v2.4.2) |
 | 2.4.3 | 11 | 198 KB | `849abc9e8873006ce008ce70fd42a9c713da69dc108d6dbdac824dde6622323a` | [v2.4.3](https://github.com/Liqevu324/trae-checkin-android/releases/tag/v2.4.3) |
 | 2.4.4 | 12 | 198 KB | `747e1e656fd88d903e236a53e76813b101962e74d7972bfe01d84bb1914f1d61` | [v2.4.4](https://github.com/Liqevu324/trae-checkin-android/releases/tag/v2.4.4) |
-| 2.4.5 | 13 | 202 KB | `39b70a487dc4ac2e6518cb4af0970b60874cfe4af201a9ffa9d6f338f1dda9f7` | [v2.4.5](https://github.com/Liqevu324/trae-checkin-android/releases/tag/v2.4.5) |
+| 2.4.5 | 13 | 198 KB | `63c898fc3a7a8d2f6caabd6f7c4070e8596dfe5a3fe5f7763105bd56f20140ca` | [v2.4.5](https://github.com/Liqevu324/trae-checkin-android/releases/tag/v2.4.5) |
 
 ## 签名
 

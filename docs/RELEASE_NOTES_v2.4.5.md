@@ -46,7 +46,7 @@ req_source=2
 ## 校验
 
 ```text
-APK SHA256:        39b70a487dc4ac2e6518cb4af0970b60874cfe4af201a9ffa9d6f338f1dda9f7
+APK SHA256:        63c898fc3a7a8d2f6caabd6f7c4070e8596dfe5a3fe5f7763105bd56f20140ca
 签名证书 SHA-256:  6f53acbfb3dc6723db5239232a1b039d003e30387727844956c6061882b824b3
 versionName:       2.4.5
 versionCode:       13

@@ -70,7 +70,7 @@
 - 可直接覆盖安装 v2.4.4 / 2.4.3 / 2.4.2 / 2.4.1 / 2.4.0 / 2.3.0 / 2.2.0：签名证书一致，账号、签到记录、
   手动设置的设备号与设置全部保留。
 - 从源码自行构建的 APK 签名不同，需先卸载旧版（会清空本地数据）。
-- 安装包 SHA256：`39b70a487dc4ac2e6518cb4af0970b60874cfe4af201a9ffa9d6f338f1dda9f7`
+- 安装包 SHA256：`63c898fc3a7a8d2f6caabd6f7c4070e8596dfe5a3fe5f7763105bd56f20140ca`
 - 签名证书 SHA256：`6f53acbfb3dc6723db5239232a1b039d003e30387727844956c6061882b824b3`
 - 历史版本 2.2.0–2.4.4 已同步发布在 [Releases](https://github.com/Liqevu324/trae-checkin-android/releases)；
   版本顺序、SHA256 与安装建议见 [`docs/APK-ARCHIVE.md`](docs/APK-ARCHIVE.md)。

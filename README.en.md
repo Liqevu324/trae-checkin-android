@@ -39,7 +39,7 @@
 - Direct upgrade from v2.2.0 / 2.3.0 / 2.4.0 / 2.4.1 / 2.4.2 / 2.4.3 / 2.4.4: the eight APKs share the same signing key.
   Accounts, check-in history, manually set device IDs and settings are preserved.
 - APKs built from source use a different signature; uninstall the old app first (this clears local data).
-- SHA256: `39b70a487dc4ac2e6518cb4af0970b60874cfe4af201a9ffa9d6f338f1dda9f7`
+- SHA256: `63c898fc3a7a8d2f6caabd6f7c4070e8596dfe5a3fe5f7763105bd56f20140ca`
 - Signing certificate SHA256: `6f53acbfb3dc6723db5239232a1b039d003e30387727844956c6061882b824b3`
 - All versions: [Releases](https://github.com/Liqevu324/trae-checkin-android/releases);
   checksums and install order: [`docs/APK-ARCHIVE.md`](docs/APK-ARCHIVE.md).
