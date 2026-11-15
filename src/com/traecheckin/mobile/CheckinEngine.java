@@ -114,6 +114,18 @@ public class CheckinEngine {
                 return fail(store, a, out, ctx.getString(R.string.checkin_err_forbidden),
                         403, doClaim);
             }
+            // status 也可能是 429/5xx：同样属于可重试，不能直接记账号失败。
+            if (http == 408 || http == 429 || (http >= 500 && http <= 599)) {
+                JSONObject r = fail(store, a, out,
+                        ctx.getString(R.string.checkin_err_retryable_http_fmt, http),
+                        http, doClaim);
+                try {
+                    r.put("retryable", true);
+                    r.put("error_type", "retryable");
+                } catch (Exception ignored) {
+                }
+                return r;
+            }
             if (http >= 400) {
                 return fail(store, a, out, ctx.getString(R.string.checkin_err_server_fmt, http),
                         http, doClaim);
@@ -425,7 +437,17 @@ public class CheckinEngine {
                     confirm.optString("__error") + "；领取结果待回查");
             return result;
         }
-        if (confirm.optInt("__http", 0) >= 400
+        int confirmHttp = confirm.optInt("__http", 0);
+        if (confirmHttp == 408 || confirmHttp == 429
+                || (confirmHttp >= 500 && confirmHttp <= 599)) {
+            // claim 已返回 code=0，但回查被限流/5xx：不能判失败，交给补签回查。
+            result.retryable = true;
+            result.code = TraeApi.intValue(confirm, "code", "Code");
+            result.message = ctx.getString(R.string.checkin_err_retryable_http_fmt, confirmHttp)
+                    + "；领取结果待回查";
+            return result;
+        }
+        if (confirmHttp >= 400
                 || !TraeApi.bool(confirm, "checked_in", "checkedIn")) {
             result.code = TraeApi.intValue(confirm, "code", "Code");
             result.message = ctx.getString(R.string.checkin_err_unconfirmed);
