@@ -7,7 +7,7 @@
 ![minSdk 24](https://img.shields.io/badge/minSdk-24-green.svg)
 ![Java 8](https://img.shields.io/badge/Java-8-orange.svg)
 ![零第三方依赖](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
-![version 2.4.4](https://img.shields.io/badge/version-2.4.4-lightgrey.svg)
+![version 2.4.5](https://img.shields.io/badge/version-2.4.5-lightgrey.svg)
 ![Build](https://github.com/Liqevu324/trae-checkin-android/actions/workflows/build.yml/badge.svg)
 
 > **重要声明（请务必先读）**
@@ -63,21 +63,21 @@
 
 ## 下载安装
 
-**最新版本 v2.4.4，安装即用。**
+**最新版本 v2.4.5，安装即用。**
 
-- [**下载 TraeCheckin-2.4.4.apk**](https://github.com/Liqevu324/trae-checkin-android/releases/latest)
+- [**下载 TraeCheckin-2.4.5.apk**](https://github.com/Liqevu324/trae-checkin-android/releases/latest)
 - 要求 Android 7.0+（minSdk 24）。
-- 可直接覆盖安装 v2.4.3 / 2.4.2 / 2.4.1 / 2.4.0 / 2.3.0 / 2.2.0：签名证书一致，账号、签到记录、
+- 可直接覆盖安装 v2.4.4 / 2.4.3 / 2.4.2 / 2.4.1 / 2.4.0 / 2.3.0 / 2.2.0：签名证书一致，账号、签到记录、
   手动设置的设备号与设置全部保留。
 - 从源码自行构建的 APK 签名不同，需先卸载旧版（会清空本地数据）。
-- 安装包 SHA256：`747e1e656fd88d903e236a53e76813b101962e74d7972bfe01d84bb1914f1d61`
+- 安装包 SHA256：`39b70a487dc4ac2e6518cb4af0970b60874cfe4af201a9ffa9d6f338f1dda9f7`
 - 签名证书 SHA256：`6f53acbfb3dc6723db5239232a1b039d003e30387727844956c6061882b824b3`
-- 历史版本 2.2.0–2.4.3 已同步发布在 [Releases](https://github.com/Liqevu324/trae-checkin-android/releases)；
+- 历史版本 2.2.0–2.4.4 已同步发布在 [Releases](https://github.com/Liqevu324/trae-checkin-android/releases)；
   版本顺序、SHA256 与安装建议见 [`docs/APK-ARCHIVE.md`](docs/APK-ARCHIVE.md)。
 
 ```bash
-sha256sum TraeCheckin-2.4.4.apk
-apksigner verify --print-certs TraeCheckin-2.4.4.apk
+sha256sum TraeCheckin-2.4.5.apk
+apksigner verify --print-certs TraeCheckin-2.4.5.apk
 ```
 
 更详细的校验值与签名信息见 [`docs/SHA256SUMS.txt`](docs/SHA256SUMS.txt) 与
@@ -93,6 +93,8 @@ apksigner verify --print-certs TraeCheckin-2.4.4.apk
 - **每日定时签到**：系统闹钟（AlarmManager）到点自动签到，结果以通知汇报，重启后自动恢复
 - **断网自动补签**：签到前预检网络，网络类失败（DNS / 连接 / 超时）按 15 / 30 / 60 分钟自动补签，最多 3 次；
   业务错误码不重试，已签到的账号不会重复领取
+- **限流与并发保护**：定时 / 首开 / 手动 / 补签串行执行，单账号互斥；HTTP 408 / 429 / 5xx 做一次 20 秒退避，
+  仍失败归为可重试并自动补签，避免 429 / 3004
 - **首次打开自动签到**：作为定时任务被系统杀掉时的兜底
 - **每日凭证保活**：每天 03:30 自动换新一次登录凭证，避免到点签到时 token 过期
 - **签到配置**：自定义签到时间、随机延迟（避免固定时间集中请求）、按账号排除自动签到
@@ -316,11 +318,12 @@ trae-checkin-android/
 | 2.4.2 | 10 | 开源前合规与文档修订：移除文档中的 `storage.json` 提取教程、移除与 MIT 冲突的「禁止商用」、补齐参考项目许可证列、语气中性化、换真机截图、整理为完整开源仓库；零业务逻辑改动，签名未轮换 |
 | 2.4.3 | 11 | 修「断网漏签」：`NetHelper` 网络预检、网络错误 3 次退避重试、失败后 15 / 30 / 60 分钟自动补签（最多 3 次）、多账号断网统一交给补签、`CheckinReceiver` 改 `goAsync()` + 20 分钟 WakeLock、修复 `thread interrupted`、日志区分网络 / 业务错误；新增 `ACCESS_NETWORK_STATE` |
 | 2.4.4 | 12 | 修「重新登录后 9074」：重新登录原样沿用旧 `device_id` / `machine_id`（手动、自动都沿用），只有新账号才生成新号；新增 `device_id_verified`，成功领取后锁定设备号；已验证号 / 手动号遇 9074 不再自动换号；设备号变化强制清零；新增/导入避免非法号和撞号；日志新增 `device_verified` |
+| 2.4.5 | 13 | 修「自动签到偶发 429/3004」：全局签到轮互斥 + 单账号 RUNNING，定时 / 首开 / 手动 / 补签不再并发重复 claim；HTTP 408/429/5xx 与网络错误改为 2 次尝试、20 秒退避；429/3004/拥塞文案归为可重试并自动补签；通知区分「网络或限流异常」 |
 
 > 1.0.0 / 2.0.0 据早期构建记录补充，未写入正式 `CHANGELOG.md`；2.1.0 起来自 `CHANGELOG.md`。
-> 2.2.0 到 2.4.4 使用同一把签名私钥，可直接覆盖安装；1.0.0 / 2.0.0 / 2.1.x 的 APK 未保留。
+> 2.2.0 到 2.4.5 使用同一把签名私钥，可直接覆盖安装；1.0.0 / 2.0.0 / 2.1.x 的 APK 未保留。
 
-主线：1.0 验证想法（WebView / HTML）→ 2.0 重写原生 → 2.1.x 修登录、假成功与日志 → 2.2.0 换官方 SOLO OAuth → 2.3.0 攻克 9074 → 2.4.0 做好界面与设置 → 2.4.1 / 2.4.2 精简与开源收尾 → 2.4.3 补网络容错与自动补签 → 2.4.4 修设备号绑定，重新登录不再换号。
+主线：1.0 验证想法（WebView / HTML）→ 2.0 重写原生 → 2.1.x 修登录、假成功与日志 → 2.2.0 换官方 SOLO OAuth → 2.3.0 攻克 9074 → 2.4.0 做好界面与设置 → 2.4.1 / 2.4.2 精简与开源收尾 → 2.4.3 补网络容错与自动补签 → 2.4.4 修设备号绑定 → 2.4.5 修并发与 429 限流。
 
 ### v2.4.3 更新详情
 
@@ -342,10 +345,22 @@ trae-checkin-android/
 - **写库不变量**：`AccountStore.update` 在设备号变化时强制清零 `device_id_verified`；新增/导入账号只接受合法且不撞号的设备号，避免 `9095`。
 - **日志**：新增 `device_verified` 字段，方便判断当前号是否已经成功领取过。
 
+### v2.4.5 更新详情
+
+- **问题根因**：自动签到、首次打开、手动签到或补签可能在同一天同一时刻并发运行，同一账号被重复 `claim`；上游按账号/IP 限流，返回 `HTTP 429` / `code=3004`。原版客户端用全局签到锁 + 单账号 RUNNING 防止重复，并对 429/5xx 做退避重试。
+- **全局轮锁**：`CheckinEngine.beginRound()` 让定时、补签、首开、手动同一时间只允许一轮；手动抢不到锁会提示「签到进行中」，定时抢不到会顺延并保留下一天的闹钟。
+- **单账号锁**：`CheckinEngine` 为每个账号加 RUNNING 互斥，同一账号不会同时被两个入口领取。
+- **瞬时错误退避**：网络错误与 HTTP 408/429/5xx 改为最多 2 次尝试，间隔 20 秒 + 抖动；不再做 3 次密集重试，避免加深限流窗口。
+- **可重试归类**：429 / 3004 / 「当前参与用户太多 / 频繁 / 限流」不再记终局失败，而是标记 `retryable`，交给 15 / 30 / 60 分钟补签；通知区分「网络或限流异常」。
+- **未变**：登录、设备号、签到请求体、积分、日志、设置与界面保持 2.4.4 行为。
+
 ## FAQ
 
+**Q：自动签到提示 429 / 3004 怎么办？**
+A：升级到 2.4.5。2.4.5 会串行化签到轮，避免并发重复领取，并对 429/5xx 做一次 20 秒退避；仍失败会自动补签。如果当天已经失败，可以稍后手动「一键签到」。
+
 **Q：重新登录后提示 9074 怎么办？**
-A：先升级到 2.4.4。2.4.4 起重新登录会自动沿用旧设备号，不会换号。如果已经从 2.4.3 中招：在账号菜单「设置设备号」填入重新登录前的旧设备号，保存为手动号，再重新登录一次。
+A：先升级到 2.4.5。2.4.4 起重新登录会自动沿用旧设备号，不会换号。如果已经从 2.4.3 中招：在账号菜单「设置设备号」填入重新登录前的旧设备号，保存为手动号，再重新登录一次。
 
 **Q：2.4.3 和 2.4.2 有什么区别？**
 A：只修网络容错与自动补签；登录、签到、设备号校验、积分明细、日志、设置与界面全部不变，签名一致，可直接覆盖安装。
@@ -443,5 +458,5 @@ A：项目不使用 androidx / Material / 任何第三方库，纯 Android SDK �
 [第三方声明](THIRD-PARTY-NOTICES.md) · [AI 使用声明](AI-USAGE.md) ·
 [安全政策](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [更新日志](CHANGELOG.md) ·
 [排障手册](docs/TROUBLESHOOTING.md) · [迁移与备份](docs/MIGRATION.md) ·
-[兼容性说明](docs/COMPATIBILITY.md) · [Release Notes](docs/RELEASE_NOTES_v2.4.4.md) ·
+[兼容性说明](docs/COMPATIBILITY.md) · [Release Notes](docs/RELEASE_NOTES_v2.4.5.md) ·
 [行为准则](CODE_OF_CONDUCT.md) · [APK 归档与校验](docs/APK-ARCHIVE.md) · [English](README.en.md)
