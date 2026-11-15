@@ -82,6 +82,26 @@ If `9074` appeared only after re-login on v2.4.3, upgrade to v2.4.4+: it reuses 
 If already affected, set the pre-re-login device ID as a manual device ID, then re-login once.
 See the [troubleshooting guide](docs/TROUBLESHOOTING.md) (Chinese) for details.
 
+### Automatic device ID
+
+The automatic device ID is the default path; **no computer is required**:
+
+1. On the first login of a new account, a unique 12–20 digit numeric device ID is generated and registered with the authorization URL.
+2. After the first successful claim, the device ID is marked verified and pinned.
+3. Re-login reuses the existing device ID instead of generating a new one.
+4. A verified ID or a manually set ID is never auto-rotated on 9074.
+5. An unverified new ID may auto-rotate once within 24 hours; if it still fails, the app asks for a manual ID.
+
+Manual device ID is only a fallback when the upstream rejects an automatic one; it is not required for normal daily use.
+
+## Retry and re-check-in
+
+- **In-request retry (v2.4.5)**: network errors and HTTP 408/429/5xx are retried at most twice, with a 20-second backoff plus jitter.
+- **Re-check-in ladder**: if still failing, the app schedules retries after **15 → 30 → 60 minutes**, up to 3 times.
+- The retry is an independent alarm (request code `1003`) and does not overwrite the next day's normal alarm.
+- Before re-check-in, the app reads `status`; accounts already checked in are skipped. A success cancels later retries; after 3 failures it stops and notifies "re-check-in limit reached".
+- Business errors such as `9074`, `9095`, `9004` and `1001` are not retried: they need a device ID fix, waiting for tomorrow, or a re-login.
+
 ## Permissions
 
 | Permission | Purpose |
