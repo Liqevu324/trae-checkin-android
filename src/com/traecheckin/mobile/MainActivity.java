@@ -433,21 +433,22 @@ public class MainActivity extends Activity {
         final AtomicInteger networkFail = new AtomicInteger(0);
         final AtomicInteger retryableFail = new AtomicInteger(0);
         final AtomicInteger skipped = new AtomicInteger(0);
-        final AtomicInteger left = new AtomicInteger(accounts.size());
 
-        for (final AccountStore.Account a : accounts) {
-            final ExecutorService ex = executor;
-            if (ex == null) {
-                if (roundActive) {
-                    CheckinEngine.endRound();
-                    roundActive = false;
-                }
-                setCheckinBusy(false, firstOpen);
-                return;
+        final ExecutorService ex = executor;
+        if (ex == null) {
+            if (roundActive) {
+                CheckinEngine.endRound();
+                roundActive = false;
             }
-            ex.execute(new Runnable() {
-                @Override
-                public void run() {
+            setCheckinBusy(false, firstOpen);
+            return;
+        }
+        ex.execute(new Runnable() {
+            @Override
+            public void run() {
+                // 同一轮内按账号串行：原版 Trae GUI / WorkBuddy 都是顺序遍历，
+                // 避免多账号同时请求触发上游 429。
+                for (final AccountStore.Account a : accounts) {
                     JSONObject r = null;
                     try {
                         r = CheckinEngine.checkinAccount(getApplicationContext(), a, true, false);
@@ -464,7 +465,6 @@ public class MainActivity extends Activity {
                     }
                     AccountStore.Account fresh = store.byId(a.id);
                     final AccountStore.Account shown = fresh == null ? a : fresh;
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -472,20 +472,17 @@ public class MainActivity extends Activity {
                             updateAccountRow(shown);
                         }
                     });
-
-                    if (left.decrementAndGet() == 0) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (destroyed) return;
-                                finishCheckinAll(ok.get(), fail.get(), networkFail.get(),
-                                        retryableFail.get(), skipped.get(), firstOpen);
-                            }
-                        });
-                    }
                 }
-            });
-        }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (destroyed) return;
+                        finishCheckinAll(ok.get(), fail.get(), networkFail.get(),
+                                retryableFail.get(), skipped.get(), firstOpen);
+                    }
+                });
+            }
+        });
     }
 
     /** 单账号签到（弹窗「立即签到」）。 */
