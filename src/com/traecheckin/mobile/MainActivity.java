@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MainActivity extends Activity {
 
     /** 版本号（设置页「关于」也会用到）。 */
-    public static final String VERSION = "2.4.4";
+    public static final String VERSION = "2.4.5";
 
     private static final int REQ_LOGIN = 2001;
 
@@ -81,6 +81,8 @@ public class MainActivity extends Activity {
     /** 账号 id -> 列表行视图，用于签到过程中局部刷新。 */
     private final Map<String, View> rowById = new HashMap<String, View>();
     private boolean checkinRunning = false;
+    /** 是否由当前页面持有全局签到轮锁；onDestroy 必须释放。 */
+    private boolean roundActive = false;
     private boolean firstOpenTriggered = false;
     private boolean destroyed = false;
 
@@ -115,6 +117,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         destroyed = true;
+        if (roundActive) {
+            CheckinEngine.endRound();
+            roundActive = false;
+        }
         if (executor != null) {
             try {
                 // 页面销毁不等于用户要取消签到。旧版 shutdownNow() 会中断正在联网的线程，
@@ -415,15 +421,27 @@ public class MainActivity extends Activity {
             }
         }
 
+        // 与定时 / 补签轮互斥：同一时间只允许一轮签到，避免重复 claim 触发 429。
+        if (!CheckinEngine.beginRound()) {
+            if (!firstOpen) toast(getString(R.string.checkin_running));
+            return;
+        }
+        roundActive = true;
         setCheckinBusy(true, firstOpen);
         final AtomicInteger ok = new AtomicInteger(0);
         final AtomicInteger fail = new AtomicInteger(0);
         final AtomicInteger networkFail = new AtomicInteger(0);
+        final AtomicInteger retryableFail = new AtomicInteger(0);
+        final AtomicInteger skipped = new AtomicInteger(0);
         final AtomicInteger left = new AtomicInteger(accounts.size());
 
         for (final AccountStore.Account a : accounts) {
             final ExecutorService ex = executor;
             if (ex == null) {
+                if (roundActive) {
+                    CheckinEngine.endRound();
+                    roundActive = false;
+                }
                 setCheckinBusy(false, firstOpen);
                 return;
             }
@@ -435,11 +453,14 @@ public class MainActivity extends Activity {
                         r = CheckinEngine.checkinAccount(getApplicationContext(), a, true, false);
                     } catch (Throwable ignored) {
                     }
-                    if (r != null && r.optBoolean("ok", false)) {
+                    if (r != null && r.optBoolean("busy", false)) {
+                        skipped.incrementAndGet();
+                    } else if (r != null && r.optBoolean("ok", false)) {
                         ok.incrementAndGet();
                     } else {
                         fail.incrementAndGet();
                         if (NetHelper.isNetworkError(r)) networkFail.incrementAndGet();
+                        else if (NetHelper.isRetryable(r)) retryableFail.incrementAndGet();
                     }
                     AccountStore.Account fresh = store.byId(a.id);
                     final AccountStore.Account shown = fresh == null ? a : fresh;
@@ -457,7 +478,8 @@ public class MainActivity extends Activity {
                             @Override
                             public void run() {
                                 if (destroyed) return;
-                                finishCheckinAll(ok.get(), fail.get(), networkFail.get(), firstOpen);
+                                finishCheckinAll(ok.get(), fail.get(), networkFail.get(),
+                                        retryableFail.get(), skipped.get(), firstOpen);
                             }
                         });
                     }
@@ -473,7 +495,16 @@ public class MainActivity extends Activity {
             return;
         }
         final ExecutorService ex = executor;
-        if (ex == null) return;
+        if (!CheckinEngine.beginRound()) {
+            toast(getString(R.string.checkin_running));
+            return;
+        }
+        roundActive = true;
+        if (ex == null) {
+            CheckinEngine.endRound();
+            roundActive = false;
+            return;
+        }
         setCheckinBusy(true, false);
         ex.execute(new Runnable() {
             @Override
@@ -483,40 +514,58 @@ public class MainActivity extends Activity {
                     r = CheckinEngine.checkinAccount(getApplicationContext(), a, true, false);
                 } catch (Throwable ignored) {
                 }
+                final boolean busy = r != null && r.optBoolean("busy", false);
                 final boolean success = r != null && r.optBoolean("ok", false);
                 final String msg = r == null ? "" : r.optString("message", "");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (destroyed) return;
+                        if (roundActive) {
+                            CheckinEngine.endRound();
+                            roundActive = false;
+                        }
                         setCheckinBusy(false, false);
                         loadAccounts();
-                        toast(success ? getString(R.string.toast_single_ok)
-                                : getString(R.string.toast_single_fail,
-                                hasText(msg) ? msg : getString(R.string.status_failed)));
+                        if (busy) {
+                            toast(getString(R.string.checkin_running));
+                        } else {
+                            toast(success ? getString(R.string.toast_single_ok)
+                                    : getString(R.string.toast_single_fail,
+                                    hasText(msg) ? msg : getString(R.string.status_failed)));
+                        }
                     }
                 });
             }
         });
     }
 
-    private void finishCheckinAll(int ok, int fail, int networkFail, boolean firstOpen) {
+    private void finishCheckinAll(int ok, int fail, int networkFail, int retryableFail,
+                                  int skipped, boolean firstOpen) {
+        if (roundActive) {
+            CheckinEngine.endRound();
+            roundActive = false;
+        }
         setCheckinBusy(false, firstOpen);
         loadAccounts();
         boolean retryScheduled = false;
-        if (networkFail > 0 && (firstOpen || Prefs.autoEnabled(this))) {
+        if ((networkFail > 0 || retryableFail > 0)
+                && (firstOpen || Prefs.autoEnabled(this))) {
             retryScheduled = AutoScheduler.scheduleNetworkRetry(this, 1);
-        } else if (fail == 0) {
+        } else if (fail == 0 && skipped == 0) {
             AutoScheduler.cancelNetworkRetry(this);
         }
         if (firstOpen) {
-            // 有账号因网络失败时不要把「今天首开签到」标记为已完成；独立补签也会继续兜底。
-            if (ok > 0 && networkFail == 0) {
+            // 有账号因网络/限流失败时不要把「今天首开签到」标记为已完成。
+            if (ok > 0 && networkFail == 0 && retryableFail == 0 && skipped == 0) {
                 Prefs.setLastOpenCheckinDate(this, AccountStore.today());
             }
             return;
         }
         String summary = getString(R.string.checkin_summary_fmt, ok, fail);
+        if (skipped > 0) {
+            summary += "，" + skipped + " 个账号正在签到";
+        }
         if (retryScheduled) {
             summary += "；" + AutoScheduler.networkRetryDelayLabel(1) + "后自动补签";
         }

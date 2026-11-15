@@ -48,21 +48,30 @@ public class TraeApi {
     }
 
     /**
-     * 状态查询与领取允许最多 3 次网络尝试（首次 + 2 次短退避重试）。
-     * 只重试 __error，不重试 HTTP / 业务错误；claim 在上游按天幂等，配合最终 status 回查。
+     * 状态查询与领取的瞬时错误重试。
+     *
+     * <p>对齐原版 Trae 客户端：网络错误、HTTP 408/429/5xx 都算瞬时错误，
+     * 总共最多 2 次尝试，失败后等 20 秒 + 抖动再试。取 2 而不是多次密集重试，
+     * 是因为上游对同账号/同 IP 的限流窗口会因密集请求加深；仍失败则交给补签阶梯。</p>
      */
     private static JSONObject request(String path, String token, String deviceId,
-                                      String bodyJson, boolean retryNetwork) {
-        int maxAttempts = retryNetwork ? 3 : 1;
+                                      String bodyJson, boolean retryTransient) {
+        int maxAttempts = retryTransient ? 2 : 1;
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             JSONObject r = requestUrl(BASE + path, token, deviceId, bodyJson);
             try {
                 r.put("__attempts", attempt);
             } catch (Exception ignored) {
             }
-            if (!r.has("__error") || attempt >= maxAttempts) return r;
+            int http = r.optInt("__http", 0);
+            boolean transientHttp = http == 408 || http == 429
+                    || (http >= 500 && http <= 599);
+            boolean transientError = r.has("__error") || transientHttp;
+            if (!transientError || attempt >= maxAttempts) return r;
             try {
-                Thread.sleep(attempt == 1 ? 3000L : 8000L);
+                // 20 秒是原版实测的退避值；额外 0~500ms 抖动，避免多账号同秒重试。
+                long jitter = (long) (Math.random() * 500L);
+                Thread.sleep(20000L + jitter);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 JSONObject stopped = new JSONObject();
@@ -134,13 +143,13 @@ public class TraeApi {
         return s.hasNext() ? s.next() : "";
     }
 
-    /** 查询今日签到状态；短暂 DNS / 连接 / 超时错误自动做有限次重试。 */
+    /** 查询今日签到状态；网络错误 / HTTP 408/429/5xx 做一次 20 秒退避重试。 */
     public static JSONObject status(String token, String deviceId) {
         return request("/trae/api/v2/ug/checkin_credits/status", token, deviceId,
                 CHECKIN_BODY, true);
     }
 
-    /** 领取今日签到积分（每天一次，重复调用幂等）；网络错误最多尝试 3 次。 */
+    /** 领取今日签到积分；网络错误 / HTTP 408/429/5xx 做一次 20 秒退避重试。 */
     public static JSONObject claim(String token, String deviceId) {
         return request("/trae/api/v2/ug/checkin_credits/claim", token, deviceId,
                 CHECKIN_BODY, true);

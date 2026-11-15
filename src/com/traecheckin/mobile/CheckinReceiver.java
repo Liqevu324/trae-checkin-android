@@ -32,6 +32,19 @@ public class CheckinReceiver extends BroadcastReceiver {
                 && AutoScheduler.ACTION_NETWORK_RETRY.equals(intent.getAction());
         final int retryCount = isRetry
                 ? intent.getIntExtra(AutoScheduler.EXTRA_RETRY_COUNT, 0) : 0;
+        // 全局轮锁：手动 / 首开 / 定时 / 补签同一时间只允许一轮，避免重复 claim 触发 429。
+        final boolean roundStarted = CheckinEngine.beginRound();
+        if (!roundStarted) {
+            // 被其它轮顺延：每日闹钟仍要排下一天，避免明天不再触发。
+            if (!isRetry) {
+                try {
+                    AutoScheduler.rescheduleForce(app);
+                } catch (Exception ignored) {
+                }
+            }
+            pendingResult.finish();
+            return;
+        }
         PowerManager.WakeLock wl = null;
         try {
             PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
@@ -52,6 +65,7 @@ public class CheckinReceiver extends BroadcastReceiver {
                     List<AccountStore.Account> accounts = store.accounts();
                     int claimed = 0, failed = 0, total = 0, deferred = 0;
                     boolean networkFailed = false;
+                    boolean retryableFailed = false;
                     boolean networkBroken = false;
                     boolean retryScheduled = false;
                     double gained = 0, remaining = 0;
@@ -68,7 +82,10 @@ public class CheckinReceiver extends BroadcastReceiver {
                         }
                         try {
                             JSONObject r = CheckinEngine.checkinAccount(app, a, true, false);
-                            if (r.optBoolean("ok", false)) {
+                            if (r.optBoolean("busy", false)) {
+                                // 另一个轮次正在处理该账号，本轮不重复 claim。
+                                deferred++;
+                            } else if (r.optBoolean("ok", false)) {
                                 if (r.optBoolean("claimed", false)) {
                                     claimed++;
                                     gained += r.optDouble("credits", 0);
@@ -81,13 +98,15 @@ public class CheckinReceiver extends BroadcastReceiver {
                                 if (NetHelper.isNetworkError(r)) {
                                     networkFailed = true;
                                     networkBroken = true;
+                                } else if (NetHelper.isRetryable(r)) {
+                                    retryableFailed = true;
                                 }
                             }
                         } catch (Exception e) {
                             failed++;
                         }
                     }
-                    if (networkFailed) {
+                    if (networkFailed || retryableFailed) {
                         retryScheduled = AutoScheduler.scheduleNetworkRetry(app, retryCount + 1);
                     } else {
                         // 网络恢复后无论业务成功还是业务失败，都停止网络补签，避免无意义循环。
@@ -95,7 +114,8 @@ public class CheckinReceiver extends BroadcastReceiver {
                     }
                     if (total > 0) {
                         notifyResult(app, claimed, failed, deferred, gained, remaining,
-                                okNames.toString(), networkFailed, retryScheduled, retryCount + 1);
+                                okNames.toString(), networkFailed, retryableFailed,
+                                retryScheduled, retryCount + 1);
                     }
                 } catch (Exception ignored) {
                 } finally {
@@ -106,6 +126,7 @@ public class CheckinReceiver extends BroadcastReceiver {
                         }
                     } catch (Exception ignored) {
                     }
+                    if (roundStarted) CheckinEngine.endRound();
                     if (lock != null && lock.isHeld()) lock.release();
                     pendingResult.finish();
                 }
@@ -115,7 +136,8 @@ public class CheckinReceiver extends BroadcastReceiver {
 
     private void notifyResult(Context ctx, int claimed, int failed, int deferred,
                               double gained, double remaining, String names,
-                              boolean networkFailed, boolean retryScheduled, int retryCount) {
+                              boolean networkFailed, boolean retryableFailed,
+                              boolean retryScheduled, int retryCount) {
         try {
             if (!Prefs.notifyEnabled(ctx)) return;
             NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -132,10 +154,11 @@ public class CheckinReceiver extends BroadcastReceiver {
                 if (failed > 0) text += "（" + failed + " 个账号失败）";
                 if (deferred > 0) text += "（" + deferred + " 个账号待补签）";
             } else if (failed > 0 || deferred > 0) {
-                title = networkFailed ? "网络异常，签到待补" : "自动签到失败";
-                if (networkFailed) {
+                boolean transientFailed = networkFailed || retryableFailed;
+                title = transientFailed ? "网络或限流异常，签到待补" : "自动签到失败";
+                if (transientFailed) {
                     int pending = failed + deferred;
-                    text = pending + " 个账号因网络异常未完成";
+                    text = pending + " 个账号因网络或限流异常未完成";
                 } else {
                     text = failed + " 个账号签到失败，请打开 App 查看详情";
                 }
@@ -143,7 +166,7 @@ public class CheckinReceiver extends BroadcastReceiver {
                 title = "今日已签到";
                 text = "所有账号今日均已签到，当前剩余 " + fmt(remaining) + " 积分";
             }
-            if (networkFailed) {
+            if (networkFailed || retryableFailed) {
                 if (retryScheduled) {
                     text += "；" + AutoScheduler.networkRetryDelayLabel(retryCount)
                             + "后自动补签（第 " + retryCount + "/"

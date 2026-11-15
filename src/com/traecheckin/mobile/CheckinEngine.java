@@ -6,7 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 签到执行引擎：状态查询 -> 领取 -> 回查状态 -> 余额刷新。
@@ -16,12 +20,57 @@ import java.util.List;
  */
 public class CheckinEngine {
 
+    /** 单账号互斥：手动 / 首开 / 定时 / 补签同时只允许一个请求在跑。 */
+    private static final Set<String> RUNNING =
+            Collections.synchronizedSet(new HashSet<String>());
+    /** 全局签到轮互斥：定时轮与手动/首开轮不能同时打上游，避免 429。 */
+    private static final AtomicBoolean ROUND_RUNNING = new AtomicBoolean(false);
+
+    public static boolean beginRound() {
+        return ROUND_RUNNING.compareAndSet(false, true);
+    }
+
+    public static void endRound() {
+        ROUND_RUNNING.set(false);
+    }
+
     /**
      * 对单个账号执行完整签到流程。
      * doClaim=true 时只有服务端回查确认 checked_in=true 才算成功。
      */
     public static JSONObject checkinAccount(Context ctx, AccountStore.Account a,
                                             boolean doClaim, boolean withDetail) {
+        if (a == null || a.id == null) {
+            JSONObject out = new JSONObject();
+            try {
+                out.put("ok", false);
+                out.put("message", "账号数据为空");
+            } catch (Exception ignored) {
+            }
+            return out;
+        }
+        if (!RUNNING.add(a.id)) {
+            JSONObject out = new JSONObject();
+            try {
+                out.put("account_id", a.id);
+                out.put("ok", false);
+                out.put("busy", true);
+                out.put("checked_in", false);
+                out.put("claimed", false);
+                out.put("message", "该账号正在签到，请稍候");
+            } catch (Exception ignored) {
+            }
+            return out;
+        }
+        try {
+            return checkinAccountOnce(ctx, a, doClaim, withDetail);
+        } finally {
+            RUNNING.remove(a.id);
+        }
+    }
+
+    private static JSONObject checkinAccountOnce(Context ctx, AccountStore.Account a,
+                                                 boolean doClaim, boolean withDetail) {
         JSONObject out = new JSONObject();
         final AccountStore store = AccountStore.get(ctx);
         boolean attemptRecorded = false;
@@ -92,6 +141,7 @@ public class CheckinEngine {
                     TraeApi.doubleValue(st, "credits", "today_credits", "todayCredits"));
             boolean claimed = false;
             boolean networkError = false;
+            boolean retryableError = false;
             String message = "";
             int resultCode = 0;
 
@@ -100,6 +150,7 @@ public class CheckinEngine {
                 claimed = cr.claimed;
                 checkedIn = claimed;
                 networkError = cr.network;
+                retryableError = cr.retryable;
                 message = cr.message;
                 resultCode = cr.code;
                 if (cr.credits >= 0d) todayCredits = cr.credits;
@@ -148,7 +199,9 @@ public class CheckinEngine {
             out.put("remaining", remaining);
             out.put("message", message);
             out.put("network_error", networkError);
+            out.put("retryable", retryableError);
             if (networkError) out.put("error_type", "network");
+            else if (retryableError) out.put("error_type", "retryable");
             if (resultCode != 0) out.put("code", resultCode);
             if (withDetail && detail.has("raw")) {
                 String raw = detail.optString("raw");
@@ -242,6 +295,11 @@ public class CheckinEngine {
             result.message = ctx.getString(R.string.checkin_err_network_fmt, result.message);
             return result;
         }
+        // 429/408/5xx：上游限流或瞬时故障，不应立即记终局失败，交给补签继续。
+        if (result.retryable) {
+            result.message = ctx.getString(R.string.checkin_err_retryable_http_fmt, result.http);
+            return result;
+        }
 
         if (result.code == 1001 || result.http == 401) {
             if (!ensureFreshToken(store, a)) {
@@ -254,6 +312,10 @@ public class CheckinEngine {
             if (result.network) {
                 result.code = 0;
                 result.message = ctx.getString(R.string.checkin_err_network_fmt, result.message);
+                return result;
+            }
+            if (result.retryable) {
+                result.message = ctx.getString(R.string.checkin_err_retryable_http_fmt, result.http);
                 return result;
             }
             if (result.code == 1001 || result.http == 401) {
@@ -304,6 +366,10 @@ public class CheckinEngine {
                 result.message = ctx.getString(R.string.checkin_err_network_fmt, result.message);
                 return result;
             }
+            if (result.retryable) {
+                result.message = ctx.getString(R.string.checkin_err_retryable_http_fmt, result.http);
+                return result;
+            }
             if (result.code == 9074) {
                 result.code = 9074;
                 result.message = ctx.getString(R.string.checkin_err_device_rejected_rotated);
@@ -334,15 +400,18 @@ public class CheckinEngine {
             result.message = ctx.getString(R.string.checkin_err_server_fmt, result.http);
             return result;
         }
+        // code=3004 或「当前参与用户太多 / 稍后重试」：上游限流，签到未生效，稍后补签。
+        if (result.code == 3004 || isCongestion(result.message)) {
+            result.retryable = true;
+            result.message = result.code != 0
+                    ? ctx.getString(R.string.checkin_err_retryable_code_fmt, result.code)
+                    : result.message + "（稍后自动补签）";
+            return result;
+        }
         if (result.code != 0) {
             result.message = result.message.length() > 0
                     ? result.message
                     : ctx.getString(R.string.checkin_err_claim_fmt, result.code);
-            return result;
-        }
-        // code=0 但文案仍是拥塞类：服务端其实没有发放，不能记成功。
-        if (isCongestion(result.message)) {
-            result.message = result.message + "（code=" + result.code + "）";
             return result;
         }
 
@@ -381,6 +450,8 @@ public class CheckinEngine {
         result.http = resp.optInt("__http", 0);
         result.network = resp.has("__error");
         result.code = TraeApi.intValue(resp, "code", "Code");
+        result.retryable = result.http == 408 || result.http == 429
+                || (result.http >= 500 && result.http <= 599);
         if (result.network) {
             result.message = resp.optString("__error", "网络错误");
             return;
@@ -392,7 +463,8 @@ public class CheckinEngine {
         if (message == null) return false;
         String m = message.toLowerCase(java.util.Locale.US);
         return m.contains("太多") || m.contains("繁忙") || m.contains("拥挤")
-                || m.contains("稍后") || m.contains("too many") || m.contains("busy");
+                || m.contains("稍后") || m.contains("频繁") || m.contains("限流")
+                || m.contains("too many") || m.contains("busy") || m.contains("rate limit");
     }
 
     private static JSONObject fail(AccountStore store, AccountStore.Account a,
@@ -424,6 +496,7 @@ public class CheckinEngine {
     private static final class ClaimResult {
         boolean claimed = false;
         boolean network = false;
+        boolean retryable = false;
         boolean deviceRotated = false;
         int http = 0;
         int code = 0;

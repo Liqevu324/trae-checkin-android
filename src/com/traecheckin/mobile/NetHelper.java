@@ -61,6 +61,12 @@ public final class NetHelper {
         return result != null && result.optBoolean("network_error", false);
     }
 
+    /** 429/408/5xx/上游拥塞：可延后补签，但不能当成账号/设备失败。 */
+    public static boolean isRetryable(JSONObject result) {
+        return result != null && (result.optBoolean("retryable", false)
+                || "retryable".equals(result.optString("error_type")));
+    }
+
     /** 兼容旧历史记录：旧版没有 error_type，只能由错误文案归类。 */
     public static boolean isNetworkMessage(String message) {
         return message != null && message.startsWith("网络错误");
